@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<section class="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-20 sm:px-6">
+  <div class="w-full max-w-md">
+    <div class="cs-glass-strong rounded-3xl p-8 shadow-card sm:p-10">
+      <div class="text-center">
+        <a href="/" class="inline-flex items-center gap-2 text-lg font-semibold text-white">
+          <span
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-emerald-600 text-sm font-bold text-slate-950"
+            >K</span
+          >
+          Klyro
+        </a>
+        <h1 class="mt-8 text-2xl font-bold text-white">Welcome back</h1>
+        <p class="mt-2 text-sm text-slate-400">Log in to manage your chatbots.</p>
+      </div>
+      <form id="login-form" class="mt-8 space-y-5" novalidate>
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-300">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            class="mt-1.5 w-full rounded-xl border border-slate-600/80 bg-slate-900/80 px-4 py-3 text-white outline-none ring-emerald-500/0 transition focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/30"
+            placeholder="you@company.com"
+          />
+          <p id="email-err" class="mt-1 hidden text-xs text-red-400"></p>
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            minlength="1"
+            class="mt-1.5 w-full rounded-xl border border-slate-600/80 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/30"
+            placeholder="••••••••"
+          />
+          <p id="password-err" class="mt-1 hidden text-xs text-red-400"></p>
+        </div>
+        <button
+          type="submit"
+          id="login-submit"
+          class="cs-btn-shine w-full rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50"
+        >
+          Log in
+        </button>
+      </form>
+      <p class="mt-6 text-center text-sm text-slate-400">
+        No account?
+        <a href="/signup" class="font-medium text-emerald-400 hover:underline">Sign up</a>
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/auth.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.CSAuth) window.CSAuth.initLogin();
+  });
+</script>
+{% endblock %}

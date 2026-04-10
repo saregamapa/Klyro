@@ -1,0 +1,119 @@
+/**
+ * Klyro — login & signup
+ */
+(function () {
+  "use strict";
+
+  function showErr(id, msg) {
+    var p = document.getElementById(id);
+    if (!p) return;
+    if (msg) {
+      p.textContent = msg;
+      p.classList.remove("hidden");
+    } else {
+      p.textContent = "";
+      p.classList.add("hidden");
+    }
+  }
+
+  window.CSAuth = {
+    initLogin: function () {
+      var form = document.getElementById("login-form");
+      if (!form) return;
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var email = document.getElementById("email").value.trim();
+        var password = document.getElementById("password").value;
+        showErr("email-err", "");
+        showErr("password-err", "");
+        if (!email) {
+          showErr("email-err", "Email is required");
+          return;
+        }
+        if (!password) {
+          showErr("password-err", "Password is required");
+          return;
+        }
+        var btn = document.getElementById("login-submit");
+        btn.disabled = true;
+        try {
+          var res = await fetch("/api/v1/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: password }),
+          });
+          var data = await res.json().catch(function () {
+            return {};
+          });
+          if (!res.ok) {
+            throw new Error(typeof data.detail === "string" ? data.detail : "Login failed");
+          }
+          localStorage.setItem("klyro_token", data.access_token);
+          localStorage.removeItem("chatsite_token");
+          if (window.CS && window.CS.toast) window.CS.toast("Welcome back!", "success");
+          window.location.href = "/dashboard";
+        } catch (err) {
+          if (window.CS && window.CS.toast) window.CS.toast(err.message, "error");
+          else alert(err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    },
+
+    initSignup: function () {
+      var form = document.getElementById("signup-form");
+      if (!form) return;
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var email = document.getElementById("email").value.trim();
+        var password = document.getElementById("password").value;
+        showErr("email-err", "");
+        showErr("password-err", "");
+        if (!email) {
+          showErr("email-err", "Email is required");
+          return;
+        }
+        if (password.length < 8) {
+          showErr("password-err", "Use at least 8 characters");
+          return;
+        }
+        var btn = document.getElementById("signup-submit");
+        btn.disabled = true;
+        try {
+          var res = await fetch("/api/v1/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: password }),
+          });
+          var data = await res.json().catch(function () {
+            return {};
+          });
+          if (!res.ok) {
+            throw new Error(typeof data.detail === "string" ? data.detail : "Signup failed");
+          }
+          var loginRes = await fetch("/api/v1/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: password }),
+          });
+          var loginData = await loginRes.json().catch(function () {
+            return {};
+          });
+          if (!loginRes.ok) {
+            throw new Error("Account created — please log in.");
+          }
+          localStorage.setItem("klyro_token", loginData.access_token);
+          localStorage.removeItem("chatsite_token");
+          if (window.CS && window.CS.toast) window.CS.toast("Account created!", "success");
+          window.location.href = "/dashboard";
+        } catch (err) {
+          if (window.CS && window.CS.toast) window.CS.toast(err.message, "error");
+          else alert(err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    },
+  };
+})();

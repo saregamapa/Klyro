@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Pricing{% endblock %}
+{% block content %}
+<section class="px-4 py-20 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-5xl text-center">
+    <h1 class="text-4xl font-bold text-white sm:text-5xl">Plans that scale with you</h1>
+    <p class="mt-4 text-lg text-slate-400">Start free. Upgrade when you need power features.</p>
+  </div>
+
+  <div class="mx-auto mt-16 grid max-w-5xl gap-8 lg:grid-cols-2">
+    <!-- Free -->
+    <div
+      class="tilt-card cs-glass flex flex-col rounded-3xl p-8 transition hover:-translate-y-1 hover:shadow-card lg:p-10"
+      data-tilt
+    >
+      <div class="tilt-card-inner flex flex-1 flex-col">
+        <p class="text-sm font-medium text-slate-400">Starter</p>
+        <p class="mt-2 text-4xl font-bold text-white">Free</p>
+        <p class="mt-2 text-sm text-slate-500">For trying Klyro on a single site.</p>
+        <ul class="mt-8 flex-1 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> 1 chatbot</li>
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> Basic ingest &amp; embed</li>
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> Widget embed</li>
+          <li class="flex gap-2 text-slate-500"><span>—</span> Analytics (coming soon)</li>
+        </ul>
+        <a
+          href="/signup"
+          class="mt-10 block rounded-2xl border border-slate-600 py-4 text-center font-semibold text-white transition hover:border-emerald-500/50 hover:bg-emerald-500/10"
+          >Start free</a
+        >
+      </div>
+    </div>
+
+    <!-- Pro -->
+    <div
+      class="tilt-card relative flex flex-col overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/40 to-slate-950 p-8 shadow-glow transition hover:-translate-y-1 hover:shadow-card lg:p-10"
+      data-tilt
+    >
+      <div
+        class="absolute right-4 top-4 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-400"
+      >
+        Popular
+      </div>
+      <div class="tilt-card-inner flex flex-1 flex-col">
+        <p class="text-sm font-medium text-emerald-400/90">Pro</p>
+        <p class="mt-2 text-4xl font-bold text-white">
+          $49<span class="text-lg font-normal text-slate-400">/mo</span>
+        </p>
+        <p class="mt-2 text-sm text-slate-400">For teams that need speed, branding, and priority support.</p>
+        <ul class="mt-8 flex-1 space-y-3 text-sm text-slate-200">
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> Unlimited chatbots</li>
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> Advanced analytics</li>
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> Custom branding</li>
+          <li class="flex gap-2"><span class="text-emerald-400">✓</span> Stripe billing ready</li>
+        </ul>
+        <button
+          type="button"
+          disabled
+          class="mt-10 cursor-not-allowed rounded-2xl bg-slate-700 py-4 text-center font-semibold text-slate-400"
+          title="Connect Stripe in dashboard (coming soon)"
+        >
+          Upgrade — Stripe soon
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p class="mx-auto mt-12 max-w-xl text-center text-sm text-slate-500">
+    Questions? <a href="/signup" class="text-emerald-400 hover:underline">Create an account</a> and we’ll
+    help you onboard.
+  </p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.CS && window.CS.initTiltCards) window.CS.initTiltCards();
+  });
+</script>
+{% endblock %}

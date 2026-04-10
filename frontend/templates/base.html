@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ page_title | default('Klyro') }}{% endblock %} — Klyro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Outfit", "system-ui", "sans-serif"] },
+            colors: {
+              brand: {
+                50: "#ecfdf5",
+                100: "#d1fae5",
+                400: "#34d399",
+                500: "#10b981",
+                600: "#059669",
+              },
+            },
+            boxShadow: {
+              glow: "0 0 80px -16px rgba(52, 211, 153, 0.4)",
+              card: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              nav: "0 1px 0 0 rgba(255,255,255,0.06)",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body class="cs-mesh-bg min-h-screen font-sans text-slate-200 antialiased">
+    <div id="toast-root" class="fixed bottom-6 right-6 z-[100] flex max-w-sm flex-col gap-2"></div>
+
+    {% if hide_nav is not defined or not hide_nav %}
+    <header
+      class="fixed left-0 right-0 top-0 z-50 border-b border-white/[0.06] bg-slate-950/75 shadow-nav backdrop-blur-2xl"
+    >
+      <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="/" class="group flex items-center gap-2.5 text-lg font-semibold tracking-tight text-white">
+          <span
+            class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 via-emerald-500 to-cyan-600 text-sm font-bold text-slate-950 shadow-glow transition group-hover:scale-[1.03]"
+            >K</span
+          >
+          <span>Klyro</span>
+        </a>
+        <nav class="hidden items-center gap-1 md:flex">
+          <a
+            href="/#features"
+            class="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/[0.04] hover:text-white"
+            >Features</a
+          >
+          <a
+            href="/#how"
+            class="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/[0.04] hover:text-white"
+            >How it works</a
+          >
+          <a
+            href="/pricing"
+            class="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/[0.04] hover:text-white"
+            >Pricing</a
+          >
+        </nav>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a
+            href="/login"
+            class="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/[0.04] hover:text-white sm:inline"
+            >Log in</a
+          >
+          <a
+            href="/signup"
+            class="cs-btn-shine rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
+            >Start free</a
+          >
+        </div>
+      </div>
+    </header>
+    {% endif %}
+
+    <main class="{% if hide_nav is not defined or not hide_nav %}pt-16{% endif %}">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if hide_footer is not defined or not hide_footer %}
+    <footer class="border-t border-white/[0.06] bg-slate-950/90 py-14">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col items-center justify-between gap-8 md:flex-row">
+          <div class="flex items-center gap-2.5 font-semibold text-white">
+            <span
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-emerald-600 text-xs font-bold text-slate-950"
+              >K</span
+            >
+            Klyro
+          </div>
+          <p class="max-w-md text-center text-sm text-slate-500 md:text-left">
+            Turn your website into an AI assistant visitors trust. © 2026 Klyro.
+          </p>
+          <div class="flex gap-8 text-sm text-slate-400">
+            <a href="/pricing" class="transition hover:text-white">Pricing</a>
+            <a href="/login" class="transition hover:text-white">Log in</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    {% endif %}
+
+    <script src="/static/js/main.js"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
