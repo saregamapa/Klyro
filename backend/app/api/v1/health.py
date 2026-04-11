@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter
 
 from app.core.config import settings
@@ -12,4 +13,6 @@ def health() -> HealthResponse:
         status="ok",
         app_name=settings.app_name,
         environment=settings.environment,
+        version="1.0.0",
+        timestamp=datetime.now(timezone.utc),
     )

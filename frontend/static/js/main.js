@@ -96,10 +96,10 @@
       typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     var avatarAgent =
-      '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 text-xs font-bold text-slate-950">K</div>';
+      '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white">K</div>';
     var bubbleAgent =
-      "max-w-[88%] rounded-2xl rounded-bl-md border border-slate-600/50 bg-slate-800/90 px-3.5 py-2.5 text-sm leading-relaxed text-slate-200 shadow-sm";
-    var bubbleUser = "max-w-[88%] rounded-2xl rounded-br-md bg-gradient-to-br from-emerald-600 to-teal-600 px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-md";
+      "max-w-[88%] rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm leading-relaxed text-slate-700 shadow-sm";
+    var bubbleUser = "max-w-[88%] rounded-2xl rounded-br-md bg-gradient-to-br from-indigo-500 to-violet-600 px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-md";
 
     function scrollToBottom() {
       root.scrollTop = root.scrollHeight;
@@ -138,10 +138,10 @@
       row.innerHTML =
         '<div class="flex items-end gap-2">' +
         avatarAgent +
-        '<div class="flex gap-1 rounded-2xl rounded-bl-md border border-slate-600/50 bg-slate-800/80 px-4 py-3">' +
-        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" style="animation-delay:0ms"></span>' +
-        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" style="animation-delay:120ms"></span>' +
-        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" style="animation-delay:240ms"></span>' +
+        '<div class="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 shadow-sm">' +
+        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-300" style="animation-delay:0ms"></span>' +
+        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-300" style="animation-delay:120ms"></span>' +
+        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-300" style="animation-delay:240ms"></span>' +
         "</div></div>";
       root.appendChild(row);
       scrollToBottom();
@@ -193,5 +193,117 @@
     }
 
     setTimeout(loop, 500);
+  };
+
+  /* ────────────────────────────────────────────────────
+     FAQ Accordion
+  ──────────────────────────────────────────────────── */
+  window.CS.initFaqAccordion = function () {
+    document.querySelectorAll(".kly-faq-item").forEach(function (item) {
+      var btn = item.querySelector(".kly-faq-btn");
+      var answer = item.querySelector(".kly-faq-answer");
+      if (!btn || !answer) return;
+      btn.addEventListener("click", function () {
+        var isOpen = answer.classList.contains("kly-faq-open");
+        // close all
+        document.querySelectorAll(".kly-faq-answer").forEach(function (a) {
+          a.classList.remove("kly-faq-open");
+          var parent = a.closest(".kly-faq-item");
+          if (parent) parent.classList.remove("kly-faq-open-parent");
+        });
+        // open clicked one (if it was closed)
+        if (!isOpen) {
+          answer.classList.add("kly-faq-open");
+          item.classList.add("kly-faq-open-parent");
+          // scroll into view if partially hidden
+          setTimeout(function () {
+            var rect = item.getBoundingClientRect();
+            if (rect.bottom > window.innerHeight) {
+              item.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+          }, 440);
+        }
+      });
+    });
+  };
+
+  /* ────────────────────────────────────────────────────
+     Scroll Reveal  (IntersectionObserver)
+  ──────────────────────────────────────────────────── */
+  window.CS.initScrollReveal = function () {
+    var els = document.querySelectorAll(".kly-reveal");
+    if (!els.length) return;
+    if (!("IntersectionObserver" in window)) {
+      // fallback: show all immediately
+      els.forEach(function (el) { el.classList.add("kly-visible"); });
+      return;
+    }
+    var obs = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("kly-visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -48px 0px" }
+    );
+    els.forEach(function (el) { obs.observe(el); });
+  };
+
+  /* ────────────────────────────────────────────────────
+     Counter animation  (count-up on scroll-into-view)
+  ──────────────────────────────────────────────────── */
+  window.CS.initCounters = function () {
+    var els = document.querySelectorAll("[data-counter]");
+    if (!els.length) return;
+    if (!("IntersectionObserver" in window)) return;
+    var obs = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var el = e.target;
+          var target = parseInt(el.getAttribute("data-counter"), 10);
+          var duration = 1600;
+          var startTime = null;
+          function tick(now) {
+            if (!startTime) startTime = now;
+            var elapsed = now - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            // ease-out-cubic
+            var eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(eased * target);
+            if (progress < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          obs.unobserve(el);
+        });
+      },
+      { threshold: 0.5 }
+    );
+    els.forEach(function (el) { obs.observe(el); });
+  };
+
+  /* ──────────────────────────────────────────────────────
+     Scroll-flip feature cards  (3D perspective rise on scroll)
+  ──────────────────────────────────────────────────────── */
+  window.CS.initFlipCards = function () {
+    var cards = document.querySelectorAll(".kly-flip-card");
+    if (!cards.length) return;
+
+    var obs = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("kly-card-visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -48px 0px" }
+    );
+
+    cards.forEach(function (card) { obs.observe(card); });
   };
 })();

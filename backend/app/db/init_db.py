@@ -42,6 +42,7 @@ DDL_STATEMENTS = [
         name TEXT,
         email TEXT,
         message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (chatbot_id) REFERENCES chatbots (id) ON DELETE CASCADE
     )
     """,
@@ -70,6 +71,13 @@ DDL_STATEMENTS = [
         FOREIGN KEY (chatbot_id) REFERENCES chatbots (id) ON DELETE CASCADE
     )
     """,
+    # Indexes
+    "CREATE INDEX IF NOT EXISTS idx_chatbots_user_id ON chatbots(user_id)",
+    "CREATE INDEX IF NOT EXISTS idx_conversations_chatbot_id ON conversations(chatbot_id)",
+    "CREATE INDEX IF NOT EXISTS idx_conversations_created_at ON conversations(created_at)",
+    "CREATE INDEX IF NOT EXISTS idx_leads_chatbot_id ON leads(chatbot_id)",
+    "CREATE INDEX IF NOT EXISTS idx_ingest_chunks_chatbot_id ON ingest_chunks(chatbot_id)",
+    "CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_chatbot_id ON chunk_embeddings(chatbot_id)",
 ]
 
 
@@ -79,6 +87,14 @@ def init_db() -> None:
     try:
         for stmt in DDL_STATEMENTS:
             conn.execute(stmt)
+
+        # Migration: add created_at to leads if missing
+        try:
+            conn.execute("ALTER TABLE leads ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+        except Exception as migration_err:
+            # Column likely already exists or other issue; log and continue
+            logger.debug("Migration for leads.created_at skipped: %s", str(migration_err))
+
         conn.commit()
         logger.info("SQLite schema ensured (%s)", get_db_path())
     except Exception:

@@ -16,7 +16,24 @@
   var BOT_ID = SCRIPT.getAttribute("data-bot-id");
   var API_ORIGIN =
     SCRIPT.getAttribute("data-api-url") || new URL(SCRIPT.src).origin;
+  var THEME = SCRIPT.getAttribute("data-theme") || "light";
   var ROOT_ID = "klyroai-widget-root";
+
+  // Generate or retrieve persistent session ID
+  var SESSION_STORAGE_KEY = "klyroai_session_id_" + BOT_ID;
+  var SESSION_ID = sessionStorage.getItem(SESSION_STORAGE_KEY);
+  if (!SESSION_ID) {
+    SESSION_ID = generateUUID();
+    sessionStorage.setItem(SESSION_STORAGE_KEY, SESSION_ID);
+  }
+
+  function generateUUID() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0;
+      var v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
 
   if (!BOT_ID || !/^\d+$/.test(String(BOT_ID).trim())) {
     console.error("[KlyroAI] Missing or invalid data-bot-id on script tag");
@@ -67,12 +84,38 @@
   }
 
   function mount() {
+    var isDark = THEME === "dark";
+    var panelBg = isDark ? "bg-slate-900" : "bg-white";
+    var panelTextColor = isDark ? "text-slate-100" : "text-slate-800";
+    var panelBorder = isDark ? "border-slate-700" : "border-slate-200";
+    var headerBg = isDark ? "bg-slate-800" : "bg-slate-50";
+    var headerBorder = isDark ? "border-slate-700" : "border-slate-100";
+    var inputBg = isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-800";
+    var inputBorder = isDark ? "border-slate-600" : "border-slate-200";
+    var bubbleUserBg = "bg-emerald-600";
+    var bubbleBotBg = isDark ? "bg-slate-800 border-slate-600" : "bg-slate-50 border-slate-100";
+    var bubbleBotText = isDark ? "text-slate-100" : "text-slate-800";
+
     root.innerHTML =
-      '<div class="pointer-events-none fixed bottom-5 right-5 z-[2147483647] flex flex-col items-end gap-3 font-sans text-slate-800">' +
-      '  <div id="klyro-panel" class="pointer-events-auto hidden h-[min(32rem,calc(100vh-6rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">' +
-      '    <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-3">' +
-      '      <span class="text-sm font-semibold text-slate-800">Chat</span>' +
-      '      <button type="button" id="klyro-close" class="rounded-lg p-1 text-slate-500 hover:bg-slate-200 hover:text-slate-700" aria-label="Close chat">&times;</button>' +
+      '<div class="pointer-events-none fixed bottom-5 right-5 z-[2147483647] flex flex-col items-end gap-3 font-sans ' +
+      panelTextColor +
+      '">' +
+      '  <div id="klyro-panel" class="pointer-events-auto hidden h-[min(32rem,calc(100vh-6rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border ' +
+      panelBorder +
+      " " +
+      panelBg +
+      ' shadow-2xl">' +
+      '    <div class="flex items-center justify-between border-b ' +
+      headerBorder +
+      " " +
+      headerBg +
+      ' px-4 py-3">' +
+      '      <span class="text-sm font-semibold">' +
+      (isDark ? "Chat" : "Chat") +
+      '</span>' +
+      '      <button type="button" id="klyro-close" class="rounded-lg p-1 ' +
+      (isDark ? "text-slate-400 hover:bg-slate-700" : "text-slate-500 hover:bg-slate-200 hover:text-slate-700") +
+      '" aria-label="Close chat">&times;</button>' +
       "    </div>" +
       '    <div id="klyro-messages" class="flex flex-1 flex-col gap-3 overflow-y-auto p-4 text-sm"></div>' +
       '    <div id="klyro-lead" class="hidden flex-col gap-2 border-t border-emerald-100 bg-emerald-50/90 px-3 py-3 text-xs">' +
@@ -85,8 +128,14 @@
       "      </div>" +
       "    </div>" +
       '    <div id="klyro-error" class="hidden border-t border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700"></div>' +
-      '    <form id="klyro-form" class="flex gap-2 border-t border-slate-100 p-3">' +
-      '      <input id="klyro-input" type="text" autocomplete="off" placeholder="Type a message…" class="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" />' +
+      '    <form id="klyro-form" class="flex gap-2 border-t ' +
+      headerBorder +
+      ' p-3">' +
+      '      <input id="klyro-input" type="text" autocomplete="off" placeholder="Type a message…" class="min-w-0 flex-1 rounded-xl border ' +
+      inputBorder +
+      " " +
+      inputBg +
+      ' px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" />' +
       '      <button type="submit" id="klyro-send" class="shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50">Send</button>' +
       "    </form>" +
       "  </div>" +
@@ -126,6 +175,53 @@
       leadBox.classList.remove("hidden");
       leadBox.classList.add("flex");
       messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function renderMarkdown(text) {
+      /**
+       * Simple markdown renderer for:
+       * - **bold** text
+       * - *italic* text
+       * - `code` (inline)
+       */
+      var html = escapeHtml(text);
+      // Replace **bold** (must be before single asterisk)
+      html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      // Replace *italic*
+      html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      // Replace `code`
+      html = html.replace(/`([^`]+)`/g, "<code style='background-color: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 3px; font-family: monospace; font-size: 0.9em;'>$1</code>");
+      return html;
+    }
+
+    function appendTypingIndicator() {
+      var wrap = document.createElement("div");
+      wrap.className = "mr-8 flex justify-start";
+      wrap.id = "klyro-typing-indicator";
+      var bubble = document.createElement("div");
+      bubble.className =
+        "max-w-[95%] rounded-2xl rounded-bl-md border border-slate-100 bg-slate-50 px-3 py-2 text-slate-800";
+      bubble.innerHTML =
+        '<div class="flex gap-1"><span style="height: 6px; width: 6px; border-radius: 50%; background: #999; animation: bounce 1.4s infinite;"></span><span style="height: 6px; width: 6px; border-radius: 50%; background: #999; animation: bounce 1.4s infinite 0.2s;"></span><span style="height: 6px; width: 6px; border-radius: 50%; background: #999; animation: bounce 1.4s infinite 0.4s;"></span></div>';
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      // Add CSS animation if not already present
+      if (!document.querySelector("#klyro-bounce-animation")) {
+        var style = document.createElement("style");
+        style.id = "klyro-bounce-animation";
+        style.innerHTML =
+          "@keyframes bounce { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }";
+        document.head.appendChild(style);
+      }
+    }
+
+    function removeTypingIndicator() {
+      var indicator = document.querySelector("#klyro-typing-indicator");
+      if (indicator) {
+        indicator.remove();
+      }
     }
 
     if (leadDismiss) {
@@ -194,7 +290,12 @@
         who === "user"
           ? "max-w-[95%] rounded-2xl rounded-br-md bg-emerald-600 px-3 py-2 text-white"
           : "max-w-[95%] rounded-2xl rounded-bl-md border border-slate-100 bg-slate-50 px-3 py-2 text-slate-800";
-      bubble.innerHTML = escapeHtml(text).replace(/\n/g, "<br/>");
+      // For bot messages, render markdown; for user messages, just escape
+      if (who === "bot") {
+        bubble.innerHTML = renderMarkdown(text).replace(/\n/g, "<br/>");
+      } else {
+        bubble.innerHTML = escapeHtml(text).replace(/\n/g, "<br/>");
+      }
       wrap.appendChild(bubble);
       messagesEl.appendChild(wrap);
       messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -220,12 +321,17 @@
       input.value = "";
       sendBtn.disabled = true;
       input.disabled = true;
+      appendTypingIndicator();
 
       try {
         var res = await fetch(API_ORIGIN + "/api/v1/widget/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chatbot_id: BOT_ID, message: text }),
+          body: JSON.stringify({
+            chatbot_id: BOT_ID,
+            message: text,
+            session_id: SESSION_ID,
+          }),
         });
         var data = await res.json().catch(function () {
           return {};
@@ -236,9 +342,11 @@
         if (!data.reply && data.reply !== "") {
           throw new Error("Invalid response from server");
         }
+        removeTypingIndicator();
         appendBubble(data.reply, "bot");
         maybeShowLeadForm(data);
       } catch (err) {
+        removeTypingIndicator();
         showError(err.message || "Something went wrong");
         appendBubble(
           "Sorry, I couldn’t get a response. Please try again.",
@@ -248,6 +356,7 @@
         sendBtn.disabled = false;
         input.disabled = false;
         input.focus();
+        messagesEl.scrollTop = messagesEl.scrollHeight;
       }
     });
   }

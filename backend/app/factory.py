@@ -1,4 +1,5 @@
 import logging
+import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
@@ -7,7 +8,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 
 from app.api import api_router
 from app.core.config import settings
@@ -16,6 +21,20 @@ from app.db.init_db import init_db
 
 def _configure_db_logging() -> None:
     level = logging.DEBUG if settings.debug else logging.INFO
+    log_format = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
+
+    # Configure root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
+
+    # Set up console handler with structured format
+    if not root_logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(log_format)
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+
+    # Configure app-specific loggers
     for name in ("app.db", "app.repositories"):
         log = logging.getLogger(name)
         log.setLevel(level)
@@ -37,6 +56,27 @@ def create_app() -> FastAPI:
         redoc_url="/api/redoc" if settings.debug else None,
         openapi_url="/api/openapi.json" if settings.debug else None,
     )
+
+    # Configure rate limiter
+    limiter = Limiter(key_func=get_remote_address)
+    app.state.limiter = limiter
+
+    # Add rate limit exception handler
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Rate limit exceeded"},
+            headers={"Retry-After": "60"},
+        )
+
+    # Add middleware for request IDs
+    @app.middleware("http")
+    async def add_request_id(request: Request, call_next):
+        request.state.request_id = str(uuid.uuid4())
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request.state.request_id
+        return response
 
     app.add_middleware(
         CORSMiddleware,
@@ -79,9 +119,9 @@ def create_app() -> FastAPI:
                 "Templates directory not found. Set FRONTEND_TEMPLATES_DIR in .env",
                 status_code=503,
             )
-        base_ctx = {"request": request, "app_name": settings.app_name}
+        base_ctx = {"app_name": settings.app_name}
         base_ctx.update(ctx)
-        return templates.TemplateResponse(template, base_ctx)
+        return templates.TemplateResponse(request, template, base_ctx)
 
     @app.get("/")
     async def root(request: Request):
@@ -105,6 +145,16 @@ def create_app() -> FastAPI:
             "dashboard.html",
             request,
             page_title="Dashboard",
+            hide_nav=True,
+            hide_footer=True,
+        )
+
+    @app.get("/dashboard/analytics")
+    async def analytics_page(request: Request):
+        return _html(
+            "analytics.html",
+            request,
+            page_title="Analytics",
             hide_nav=True,
             hide_footer=True,
         )

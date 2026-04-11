@@ -24,6 +24,7 @@
         var text = input.value.trim();
         if (!text) return;
         input.value = "";
+        input.disabled = true;
 
         var userDiv = document.createElement("div");
         userDiv.className = "flex justify-end";
@@ -45,6 +46,7 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ chatbot_id: chatbotId, message: text }),
+            signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined,
           });
           var data = await res.json().catch(function () {
             return {};
@@ -128,8 +130,11 @@
           }
         } catch (err) {
           loading.remove();
-          if (window.CS && window.CS.toast) window.CS.toast(err.message, "error");
+          var errMsg = err.name === "AbortError" ? "Request timed out. Please try again." : (err.message || "Network error. Please try again.");
+          if (window.CS && window.CS.toast) window.CS.toast(errMsg, "error");
         }
+        input.disabled = false;
+        input.focus();
         messages.scrollTop = messages.scrollHeight;
       });
     },

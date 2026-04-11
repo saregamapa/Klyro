@@ -1,7 +1,14 @@
-.env
+# Database
+*.db
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+backend/.venv/
 .venv/
 venv/
-__pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
@@ -9,5 +16,15 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
 .DS_Store
-backend/database.db
+Thumbs.db
+
+# Environment
+.env

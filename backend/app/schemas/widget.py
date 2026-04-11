@@ -1,13 +1,27 @@
 from __future__ import annotations
 
+import html
+import re
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class WidgetChatRequest(BaseModel):
     chatbot_id: int = Field(..., ge=1)
-    message: str = Field(..., min_length=1, max_length=8000)
+    message: str = Field(..., min_length=1, max_length=2000)
+
+    @field_validator("message")
+    @classmethod
+    def sanitize_message(cls, v: str) -> str:
+        """Sanitize user message: strip HTML tags and whitespace."""
+        # Remove HTML tags
+        sanitized = re.sub(r"<[^>]+>", "", v)
+        # Unescape HTML entities
+        sanitized = html.unescape(sanitized)
+        # Strip leading/trailing whitespace
+        sanitized = sanitized.strip()
+        return sanitized
 
 
 class WidgetChatResponse(BaseModel):

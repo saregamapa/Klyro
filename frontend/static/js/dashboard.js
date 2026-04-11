@@ -342,89 +342,96 @@
             };
           }
 
-          return fetch("/api/v1/chatbots/" + id + "/conversations", { headers: h });
-        })
-        .then(function (r) {
-          return r.json().then(function (d) {
-            return { ok: r.ok, d: d };
-          });
-        })
-        .then(function (_ref2) {
-          if (_ref2.ok && Array.isArray(_ref2.d)) {
-            var el = document.getElementById("stat-conv");
-            if (el) el.textContent = String(_ref2.d.length);
-          }
-          return Promise.all([
-            fetch("/api/v1/analytics/" + id, { headers: h }).then(function (r) {
-              return r.json().then(function (d) {
-                return { ok: r.ok, d: d };
-              });
-            }),
-            fetch("/api/v1/chatbots/" + id + "/leads", { headers: h }).then(function (r) {
-              return r.json().then(function (d) {
-                return { ok: r.ok, d: d };
-              });
-            }),
-          ]);
-        })
-        .then(function (pair) {
-          var ar = pair[0];
-          var lr = pair[1];
-          var sumEl = document.getElementById("analytics-summary");
-          var topWrap = document.getElementById("analytics-top-wrap");
-          var topList = document.getElementById("analytics-top-list");
-          if (ar.ok && ar.d) {
-            if (sumEl)
-              sumEl.textContent =
-                ar.d.total_chats + " total chats — every visitor question is stored for analytics.";
-            if (topList && topWrap) {
-              topList.innerHTML = "";
-              if (ar.d.top_questions && ar.d.top_questions.length) {
-                topWrap.classList.remove("hidden");
-                ar.d.top_questions.forEach(function (q) {
-                  var li = document.createElement("li");
-                  li.textContent = q.question + " · " + q.count + "×";
-                  topList.appendChild(li);
-                });
-              } else {
-                topWrap.classList.add("hidden");
+          // Fetch conversations (paginated response)
+          fetch("/api/v1/chatbots/" + id + "/conversations", { headers: h })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              var el = document.getElementById("stat-conv");
+              if (el) {
+                var count = typeof d.total === "number" ? d.total : (Array.isArray(d) ? d.length : 0);
+                el.textContent = String(count);
               }
-            }
-          } else if (sumEl) {
-            sumEl.textContent = "Could not load analytics.";
-          }
-          var leadsBody = document.getElementById("leads-table-body");
-          var leadsEmpty = document.getElementById("leads-empty");
-          var statLeads = document.getElementById("stat-leads");
-          if (lr.ok && Array.isArray(lr.d) && leadsBody) {
-            if (statLeads) statLeads.textContent = String(lr.d.length);
-            leadsBody.innerHTML = "";
-            if (!lr.d.length) {
-              if (leadsEmpty) leadsEmpty.classList.remove("hidden");
-            } else {
-              if (leadsEmpty) leadsEmpty.classList.add("hidden");
-              lr.d.forEach(function (lead) {
-                var tr = document.createElement("tr");
-                tr.className = "border-t border-slate-700/40";
-                tr.innerHTML =
-                  '<td class="py-2.5 pr-4 align-top">' +
-                  escapeHtml(lead.name || "—") +
-                  '</td><td class="py-2.5 pr-4 align-top">' +
-                  escapeHtml(lead.email || "—") +
-                  '</td><td class="py-2.5 align-top text-slate-500">' +
-                  escapeHtml((lead.message || "").slice(0, 120)) +
-                  (lead.message && lead.message.length > 120 ? "…" : "") +
-                  "</td>";
-                leadsBody.appendChild(tr);
-              });
-            }
-          } else if (statLeads) {
-            statLeads.textContent = "—";
-          }
+            })
+            .catch(function () {});
+
+          // Fetch analytics (independent, non-blocking)
+          fetch("/api/v1/analytics/" + id, { headers: h })
+            .then(function (r) {
+              if (!r.ok) throw new Error("Analytics " + r.status);
+              return r.json();
+            })
+            .then(function (d) {
+              var sumEl = document.getElementById("analytics-summary");
+              var topWrap = document.getElementById("analytics-top-wrap");
+              var topList = document.getElementById("analytics-top-list");
+              if (sumEl)
+                sumEl.textContent =
+                  d.total_chats + " total chats — every visitor question is stored for analytics.";
+              if (topList && topWrap) {
+                topList.innerHTML = "";
+                if (d.top_questions && d.top_questions.length) {
+                  topWrap.classList.remove("hidden");
+                  d.top_questions.forEach(function (q) {
+                    var li = document.createElement("li");
+                    li.textContent = q.question + " · " + q.count + "×";
+                    topList.appendChild(li);
+                  });
+                } else {
+                  topWrap.classList.add("hidden");
+                }
+              }
+            })
+            .catch(function (err) {
+              console.warn("Analytics load failed:", err.message);
+              var sumEl = document.getElementById("analytics-summary");
+              if (sumEl) sumEl.textContent = "Could not load analytics.";
+            });
+
+          // Fetch leads (independent, non-blocking, handles paginated response)
+          fetch("/api/v1/chatbots/" + id + "/leads", { headers: h })
+            .then(function (r) {
+              if (!r.ok) throw new Error("Leads " + r.status);
+              return r.json();
+            })
+            .then(function (d) {
+              var leadsBody = document.getElementById("leads-table-body");
+              var leadsEmpty = document.getElementById("leads-empty");
+              var statLeads = document.getElementById("stat-leads");
+              var items = Array.isArray(d) ? d : (d.items || []);
+              var total = typeof d.total === "number" ? d.total : items.length;
+              if (statLeads) statLeads.textContent = String(total);
+              if (leadsBody) {
+                leadsBody.innerHTML = "";
+                if (!items.length) {
+                  if (leadsEmpty) leadsEmpty.classList.remove("hidden");
+                } else {
+                  if (leadsEmpty) leadsEmpty.classList.add("hidden");
+                  items.forEach(function (lead) {
+                    var tr = document.createElement("tr");
+                    tr.className = "border-t border-slate-700/40";
+                    tr.innerHTML =
+                      '<td class="py-2.5 pr-4 align-top">' +
+                      escapeHtml(lead.name || "—") +
+                      '</td><td class="py-2.5 pr-4 align-top">' +
+                      escapeHtml(lead.email || "—") +
+                      '</td><td class="py-2.5 align-top text-slate-500">' +
+                      escapeHtml((lead.message || "").slice(0, 120)) +
+                      (lead.message && lead.message.length > 120 ? "…" : "") +
+                      "</td>";
+                    leadsBody.appendChild(tr);
+                  });
+                }
+              }
+            })
+            .catch(function (err) {
+              console.warn("Leads load failed:", err.message);
+              var statLeads = document.getElementById("stat-leads");
+              if (statLeads) statLeads.textContent = "—";
+            });
         })
         .catch(function (err) {
+          console.error("Detail page error:", err);
           if (window.CS && window.CS.toast) window.CS.toast(err.message, "error");
-          window.location.href = "/dashboard";
         });
     },
   };

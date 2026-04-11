@@ -19,3 +19,10 @@ class LeadPublic(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     message: Optional[str] = None
+
+
+class PaginatedLeads(BaseModel):
+    items: list[LeadPublic]
+    total: int
+    limit: int
+    offset: int

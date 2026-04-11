@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<div class="flex min-h-screen">
+  <div
+    class="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between border-b border-white/10 bg-slate-950/95 px-4 backdrop-blur-xl lg:hidden"
+  >
+    <a href="/dashboard" class="flex items-center gap-2 font-semibold text-white">
+      <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-emerald-600 text-[10px] font-bold text-slate-950">K</span>
+      Klyro
+    </a>
+    <div class="flex gap-3 text-sm">
+      <a href="/chatbot/create" class="text-emerald-400">+ New</a>
+      <button type="button" id="logout-btn-mobile" class="text-slate-400">Out</button>
+    </div>
+  </div>
+  <aside
+    class="fixed bottom-0 left-0 top-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-slate-950/95 backdrop-blur-xl lg:flex"
+  >
+    <div class="border-b border-white/5 p-4">
+      <a href="/" class="flex items-center gap-2 font-semibold text-white transition hover:text-emerald-300">
+        <span
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-emerald-600 text-xs font-bold text-slate-950"
+          >K</span
+        >
+        Klyro
+      </a>
+    </div>
+    <nav class="flex flex-1 flex-col gap-1 p-4">
+      <a
+        href="/dashboard"
+        class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"
+      >
+        <span>🤖</span> Chatbots
+      </a>
+      <a
+        href="/dashboard/analytics"
+        class="flex items-center gap-3 rounded-xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-400"
+      >
+        <span>📈</span> Analytics
+      </a>
+      <span
+        class="flex cursor-not-allowed items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-500"
+        title="Coming soon"
+      >
+        <span>⚙️</span> Settings
+      </span>
+    </nav>
+    <div class="border-t border-white/5 p-4">
+      <button
+        type="button"
+        id="logout-btn"
+        class="w-full rounded-xl border border-slate-700 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800"
+      >
+        Log out
+      </button>
+    </div>
+  </aside>
+
+  <div class="flex flex-1 flex-col pt-14 lg:pt-0 lg:pl-64">
+    <header
+      class="sticky top-14 z-30 flex items-center justify-between border-b border-white/5 bg-slate-950/80 px-4 py-4 backdrop-blur-xl sm:px-8 lg:top-0"
+    >
+      <div>
+        <h1 class="text-xl font-bold text-white">Analytics overview</h1>
+        <p class="text-sm text-slate-500">Monitor your chatbot performance.</p>
+      </div>
+    </header>
+
+    <div class="flex-1 px-4 py-8 sm:px-8">
+      <!-- Chatbot Selector -->
+      <div id="analytics-selector" class="mb-8">
+        <label for="chatbot-select" class="block text-sm font-medium text-slate-300 mb-2">Select chatbot</label>
+        <select
+          id="chatbot-select"
+          class="w-full max-w-xs rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm text-white transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
+        >
+          <option value="">Choose a chatbot…</option>
+        </select>
+      </div>
+
+      <!-- Loading State -->
+      <div id="analytics-loading" class="space-y-6">
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="cs-glass rounded-2xl p-6">
+            <div class="cs-skeleton h-4 w-1/3 rounded mb-3"></div>
+            <div class="cs-skeleton h-8 w-2/3 rounded"></div>
+          </div>
+          <div class="cs-glass rounded-2xl p-6">
+            <div class="cs-skeleton h-4 w-1/3 rounded mb-3"></div>
+            <div class="cs-skeleton h-8 w-2/3 rounded"></div>
+          </div>
+          <div class="cs-glass rounded-2xl p-6">
+            <div class="cs-skeleton h-4 w-1/3 rounded mb-3"></div>
+            <div class="cs-skeleton h-8 w-2/3 rounded"></div>
+          </div>
+        </div>
+        <div class="cs-glass rounded-2xl p-6">
+          <div class="cs-skeleton h-4 w-1/4 rounded mb-4"></div>
+          <div class="space-y-3">
+            <div class="cs-skeleton h-3 w-full rounded"></div>
+            <div class="cs-skeleton h-3 w-5/6 rounded"></div>
+            <div class="cs-skeleton h-3 w-4/5 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="analytics-empty" class="hidden cs-glass rounded-2xl p-12 text-center">
+        <p class="text-lg font-medium text-white">No chatbots found</p>
+        <p class="mt-2 text-sm text-slate-400">Create a chatbot to start tracking analytics.</p>
+        <a
+          href="/chatbot/create"
+          class="mt-6 inline-flex rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-500"
+          >Create chatbot</a
+        >
+      </div>
+
+      <!-- Analytics Content -->
+      <div id="analytics-content" class="hidden space-y-6">
+        <!-- Stat Cards -->
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="cs-glass rounded-2xl p-6 border border-emerald-500/20">
+            <p class="text-sm text-slate-400">Total conversations</p>
+            <p class="mt-2 text-3xl font-bold text-emerald-400" id="stat-conversations">—</p>
+          </div>
+          <div class="cs-glass rounded-2xl p-6 border border-teal-500/20">
+            <p class="text-sm text-slate-400">Total leads</p>
+            <p class="mt-2 text-3xl font-bold text-teal-400" id="stat-leads">—</p>
+          </div>
+          <div class="cs-glass rounded-2xl p-6 border border-cyan-500/20">
+            <p class="text-sm text-slate-400">Avg messages/day</p>
+            <p class="mt-2 text-3xl font-bold text-cyan-400" id="stat-avg">—</p>
+          </div>
+        </div>
+
+        <!-- Top Questions -->
+        <section id="top-questions-wrap" class="hidden cs-glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-white">Top visitor questions</h2>
+          <ol id="top-questions-list" class="mt-4 space-y-2"></ol>
+        </section>
+
+        <!-- Recent Conversations -->
+        <section class="cs-glass rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-white">Recent conversations</h2>
+          <p class="mt-1 text-sm text-slate-400">Last 10 from your chatbot.</p>
+          <div id="conversations-table" class="mt-4 overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead>
+                <tr class="border-b border-slate-700 text-xs uppercase tracking-wide text-slate-500">
+                  <th class="pb-3 font-medium">Created</th>
+                  <th class="pb-3 font-medium">Messages</th>
+                  <th class="pb-3 font-medium">Visitor</th>
+                </tr>
+              </thead>
+              <tbody id="conversations-body"></tbody>
+            </table>
+          </div>
+          <p id="conversations-empty" class="hidden mt-4 text-sm text-slate-500">No conversations yet.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/analytics.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.CSAnalytics) window.CSAnalytics.init();
+  });
+</script>
+{% endblock %}

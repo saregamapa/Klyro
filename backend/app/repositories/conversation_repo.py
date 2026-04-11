@@ -64,15 +64,19 @@ def top_questions_for_chatbot(
 def get_conversations_by_chatbot(
     conn: sqlite3.Connection,
     chatbot_id: int,
+    *,
+    limit: int = 50,
+    offset: int = 0,
 ) -> list[dict[str, Any]]:
-    logger.debug("get_conversations_by_chatbot chatbot_id=%s", chatbot_id)
+    logger.debug("get_conversations_by_chatbot chatbot_id=%s limit=%s offset=%s", chatbot_id, limit, offset)
     cur = conn.execute(
         """
         SELECT id, chatbot_id, user_message, bot_response, created_at
         FROM conversations
         WHERE chatbot_id = ?
         ORDER BY id ASC
+        LIMIT ? OFFSET ?
         """,
-        (chatbot_id,),
+        (chatbot_id, limit, offset),
     )
     return rows_to_dicts(cur.fetchall())

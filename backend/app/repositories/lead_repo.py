@@ -33,7 +33,8 @@ def list_leads_for_chatbot(
     conn: sqlite3.Connection,
     chatbot_id: int,
     *,
-    limit: int = 100,
+    limit: int = 50,
+    offset: int = 0,
 ) -> list[dict[str, Any]]:
     cur = conn.execute(
         """
@@ -41,8 +42,17 @@ def list_leads_for_chatbot(
         FROM leads
         WHERE chatbot_id = ?
         ORDER BY id DESC
-        LIMIT ?
+        LIMIT ? OFFSET ?
         """,
-        (chatbot_id, limit),
+        (chatbot_id, limit, offset),
     )
     return rows_to_dicts(cur.fetchall())
+
+
+def count_leads_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> int:
+    cur = conn.execute(
+        "SELECT COUNT(*) AS c FROM leads WHERE chatbot_id = ?",
+        (chatbot_id,),
+    )
+    row = cur.fetchone()
+    return int(row["c"])

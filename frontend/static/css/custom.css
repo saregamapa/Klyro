@@ -1,11 +1,11 @@
-/* Klyro — premium SaaS surface */
+/* Klyro — premium SaaS surface (light mode) */
 
 :root {
-  --kly-glass: rgba(15, 23, 42, 0.72);
-  --kly-glass-border: rgba(148, 163, 184, 0.1);
-  --kly-mesh-1: rgba(45, 212, 191, 0.09);
-  --kly-mesh-2: rgba(99, 102, 241, 0.07);
-  --kly-mesh-3: rgba(14, 165, 233, 0.05);
+  --kly-glass: rgba(255, 255, 255, 0.82);
+  --kly-glass-border: rgba(100, 116, 139, 0.12);
+  --kly-mesh-1: rgba(99, 102, 241, 0.09);   /* indigo */
+  --kly-mesh-2: rgba(139, 92, 246, 0.07);   /* violet */
+  --kly-mesh-3: rgba(236, 72, 153, 0.05);   /* pink */
 }
 
 html {
@@ -16,15 +16,15 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-/* Rich mesh — depth without noise */
+/* Light mesh background */
 .kly-mesh-bg,
 .cs-mesh-bg {
-  background-color: #030712;
+  background-color: #f8fafc;
   background-image:
-    radial-gradient(ellipse 100% 80% at 50% -30%, var(--kly-mesh-1), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 100% 10%, var(--kly-mesh-2), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 0% 80%, var(--kly-mesh-3), transparent 45%),
-    radial-gradient(circle at 50% 100%, rgba(15, 23, 42, 1) 0%, transparent 60%);
+    radial-gradient(ellipse 100% 80% at 50% -20%, var(--kly-mesh-1), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 100% 10%, var(--kly-mesh-2), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 0% 90%, var(--kly-mesh-3), transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(241, 245, 249, 0.8) 0%, transparent 70%);
 }
 
 /* Glass */
@@ -35,16 +35,16 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--kly-glass-border);
   box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 4px 24px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .cs-glass-strong,
 .kly-glass-strong {
-  background: rgba(15, 23, 42, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(100, 116, 139, 0.14);
 }
 
 @keyframes kly-float {
@@ -86,7 +86,7 @@ body {
 
 .cs-text-gradient,
 .kly-text-gradient {
-  background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 35%, #a5f3fc 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 45%, #db2777 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -114,9 +114,9 @@ body {
 .kly-skeleton {
   background: linear-gradient(
     90deg,
-    rgba(51, 65, 85, 0.3) 25%,
-    rgba(71, 85, 105, 0.45) 50%,
-    rgba(51, 65, 85, 0.3) 75%
+    rgba(203, 213, 225, 0.5) 25%,
+    rgba(226, 232, 240, 0.7) 50%,
+    rgba(203, 213, 225, 0.5) 75%
   );
   background-size: 200% 100%;
   animation: kly-shimmer 1.15s ease-in-out infinite;
@@ -152,7 +152,7 @@ body {
   background: linear-gradient(
     105deg,
     transparent 40%,
-    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.25) 50%,
     transparent 60%
   );
   transform: translateX(-100%);
@@ -182,8 +182,8 @@ body {
 
 /* Subtle grid for hero device */
 .kly-device-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -192,8 +192,125 @@ body {
   width: 6px;
 }
 .kly-chat-scroll::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(100, 116, 139, 0.3);
   border-radius: 4px;
+}
+
+/* ── Logo Marquee ────────────────────────────────────── */
+@keyframes kly-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.kly-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: kly-marquee 30s linear infinite;
+}
+.kly-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Scroll reveal ───────────────────────────────────── */
+.kly-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.kly-reveal.kly-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.kly-reveal-delay-0 { transition-delay: 0s; }
+.kly-reveal-delay-1 { transition-delay: 0.1s; }
+.kly-reveal-delay-2 { transition-delay: 0.2s; }
+.kly-reveal-delay-3 { transition-delay: 0.32s; }
+.kly-reveal-delay-4 { transition-delay: 0.44s; }
+
+/* ── FAQ Accordion ───────────────────────────────────── */
+.kly-faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.32s ease;
+}
+.kly-faq-answer.kly-faq-open {
+  max-height: 400px;
+  opacity: 1;
+}
+.kly-faq-icon {
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kly-faq-open-parent .kly-faq-icon {
+  transform: rotate(45deg);
+}
+.kly-faq-item {
+  transition: border-color 0.25s ease;
+}
+.kly-faq-open-parent {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* ── Counter (display only) ──────────────────────────── */
+.kly-counter { display: inline; }
+
+/* ── Star ratings ────────────────────────────────────── */
+.kly-star { color: #f59e0b; }
+
+/* ── Announcement bar ────────────────────────────────── */
+@keyframes kly-slide-in-top {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.kly-announcement {
+  animation: kly-slide-in-top 0.45s ease forwards;
+}
+
+/* ── Testimonial featured card quote mark ────────────── */
+.kly-quote-mark {
+  font-size: 6rem;
+  line-height: 0;
+  color: rgba(99, 102, 241, 0.12);
+  font-family: Georgia, serif;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  pointer-events: none;
+  select: none;
+}
+
+/* ── Scroll-flip feature cards ───────────────────────── */
+.kly-flip-card {
+  opacity: 0;
+  transform: perspective(900px) rotateX(8deg) translateY(56px) scale(0.97);
+  transition:
+    opacity  0.72s ease,
+    transform 0.88s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+.kly-flip-card.kly-card-visible {
+  opacity: 1;
+  transform: perspective(900px) rotateX(0deg) translateY(0px) scale(1);
+}
+
+/* Stagger sibling cards */
+.kly-flip-card:nth-child(2) { transition-delay: 0.05s; }
+.kly-flip-card:nth-child(3) { transition-delay: 0.08s; }
+.kly-flip-card:nth-child(4) { transition-delay: 0.1s;  }
+
+/* Crawl progress bar animation */
+@keyframes kly-bar-grow {
+  from { width: 0%;   }
+  to   { width: 74%;  }
+}
+.kly-progress-bar {
+  animation: kly-bar-grow 2.2s cubic-bezier(0.25, 1, 0.5, 1) 0.6s both;
+}
+
+/* Step circle number glow pulse on hover */
+.kly-step-circle:hover {
+  box-shadow: 0 0 32px rgba(16, 185, 129, 0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -207,8 +324,15 @@ body {
   .kly-skeleton,
   .cs-toast-item,
   .kly-toast-item,
-  .kly-hero-msg {
+  .kly-hero-msg,
+  .kly-marquee-track,
+  .kly-announcement {
     animation: none;
+  }
+  .kly-reveal,
+  .kly-flip-card {
+    opacity: 1;
+    transform: none;
   }
   html {
     scroll-behavior: auto;

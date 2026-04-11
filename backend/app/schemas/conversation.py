@@ -12,3 +12,10 @@ class ConversationPublic(BaseModel):
     user_message: str
     bot_response: str
     created_at: str
+
+
+class PaginatedConversations(BaseModel):
+    items: list[ConversationPublic]
+    total: int
+    limit: int
+    offset: int

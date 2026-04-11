@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: klyro
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DATABASE_PATH
+        value: /app/data/database.db
+      - key: FRONTEND_STATIC_DIR
+        value: ../frontend/static
+      - key: FRONTEND_TEMPLATES_DIR
+        value: ../frontend/templates
+      - key: CORS_ALLOW_ORIGINS
+        value: "*"
+      - key: VECTOR_BACKEND
+        value: sqlite
+    disk:
+      name: klyro-data
+      mountPath: /app/data
+      sizeGB: 1

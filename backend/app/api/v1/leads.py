@@ -3,12 +3,12 @@ from __future__ import annotations
 import logging
 import sqlite3
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 
 from app.api.chatbot_access import require_owned_chatbot
 from app.api.deps import CurrentUser, DbConn
 from app.repositories import lead_repo
-from app.schemas.lead import LeadCreate, LeadCreated, LeadPublic
+from app.schemas.lead import LeadCreate, LeadCreated, LeadPublic, PaginatedLeads
 
 logger = logging.getLogger(__name__)
 
@@ -17,25 +17,37 @@ router = APIRouter(prefix="/chatbots", tags=["leads"])
 
 @router.get(
     "/{chatbot_id}/leads",
-    response_model=list[LeadPublic],
+    response_model=PaginatedLeads,
 )
 def list_leads(
     chatbot_id: int,
     db: DbConn,
     current_user: CurrentUser,
-) -> list[LeadPublic]:
-    require_owned_chatbot(db, chatbot_id, current_user.id)
-    rows = lead_repo.list_leads_for_chatbot(db, chatbot_id, limit=100)
-    return [
-        LeadPublic(
-            id=int(r["id"]),
-            chatbot_id=int(r["chatbot_id"]),
-            name=r.get("name"),
-            email=r.get("email"),
-            message=r.get("message"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+) -> PaginatedLeads:
+    try:
+        require_owned_chatbot(db, chatbot_id, current_user.id)
+        total = lead_repo.count_leads_for_chatbot(db, chatbot_id)
+        rows = lead_repo.list_leads_for_chatbot(db, chatbot_id, limit=limit, offset=offset)
+        return PaginatedLeads(
+            items=[
+                LeadPublic(
+                    id=int(r["id"]),
+                    chatbot_id=int(r["chatbot_id"]),
+                    name=r.get("name"),
+                    email=r.get("email"),
+                    message=r.get("message"),
+                )
+                for r in rows
+            ],
+            total=total,
+            limit=limit,
+            offset=offset,
         )
-        for r in rows
-    ]
+    except Exception as e:
+        logger.exception("Leads endpoint error for chatbot_id=%s: %s", chatbot_id, e)
+        raise
 
 
 @router.post(

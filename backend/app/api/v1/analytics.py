@@ -21,8 +21,12 @@ def get_chatbot_analytics(
     db: DbConn,
     current_user: CurrentUser,
 ) -> AnalyticsResponse:
-    require_owned_chatbot(db, chatbot_id, current_user.id)
-    total = conversation_repo.count_conversations_for_chatbot(db, chatbot_id)
-    rows = conversation_repo.top_questions_for_chatbot(db, chatbot_id, limit=15)
-    top = [TopQuestion(question=q, count=c) for q, c in rows]
-    return AnalyticsResponse(total_chats=total, top_questions=top)
+    try:
+        require_owned_chatbot(db, chatbot_id, current_user.id)
+        total = conversation_repo.count_conversations_for_chatbot(db, chatbot_id)
+        rows = conversation_repo.top_questions_for_chatbot(db, chatbot_id, limit=15)
+        top = [TopQuestion(question=q, count=c) for q, c in rows]
+        return AnalyticsResponse(total_chats=total, top_questions=top)
+    except Exception as e:
+        logger.exception("Analytics endpoint error for chatbot_id=%s: %s", chatbot_id, e)
+        raise

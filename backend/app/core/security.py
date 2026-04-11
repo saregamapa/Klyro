@@ -45,9 +45,39 @@ def create_access_token(*, user_id: int, email: str) -> str:
     )
 
 
+def create_refresh_token(*, user_id: int, email: str) -> str:
+    """Create a refresh token with 7-day expiry."""
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(days=7)
+    payload: dict[str, Any] = {
+        "sub": str(user_id),
+        "email": email,
+        "iat": now,
+        "exp": expire,
+        "type": "refresh",
+    }
+    return jwt.encode(
+        payload,
+        settings.secret_key,
+        algorithm=settings.jwt_algorithm,
+    )
+
+
 def decode_access_token(token: str) -> dict[str, Any]:
     return jwt.decode(
         token,
         settings.secret_key,
         algorithms=[settings.jwt_algorithm],
     )
+
+
+def decode_refresh_token(token: str) -> dict[str, Any]:
+    """Decode and validate a refresh token."""
+    payload = jwt.decode(
+        token,
+        settings.secret_key,
+        algorithms=[settings.jwt_algorithm],
+    )
+    if payload.get("type") != "refresh":
+        raise ValueError("Invalid token type")
+    return payload

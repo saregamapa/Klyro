@@ -1,191 +1,182 @@
 {% extends "base.html" %}
-{% block title %}AI assistant for your website{% endblock %}
+{% block title %}AI expert chatbot for your website{% endblock %}
 {% block content %}
-<!-- Hero -->
-<section class="relative overflow-hidden px-4 pb-28 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
-  <div
-    class="pointer-events-none absolute -left-40 top-24 h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px] cs-glow-orb"
-  ></div>
-  <div
-    class="pointer-events-none absolute -right-32 top-32 h-72 w-72 rounded-full bg-cyan-500/10 blur-[100px] cs-float-delay cs-glow-orb"
-  ></div>
-  <div
-    class="pointer-events-none absolute bottom-0 left-1/2 h-64 w-[min(90%,720px)] -translate-x-1/2 rounded-full bg-violet-600/10 blur-[90px]"
-  ></div>
+
+<!-- ═══════════════════════════ ANNOUNCEMENT BAR ════════════════════════════ -->
+<div id="kly-announcement" class="kly-announcement relative z-40 border-b border-indigo-200 bg-gradient-to-r from-indigo-50 via-white to-violet-50 px-4 py-2.5">
+  <div class="mx-auto flex max-w-7xl items-center justify-center gap-3 text-sm">
+    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500"></span>
+    <span class="text-slate-600">🎉 <span class="font-medium text-slate-900">Multi-page crawl</span> is now live — train on your entire docs site in one click.</span>
+    <a href="/signup" class="whitespace-nowrap font-medium text-indigo-600 hover:underline">Try it free →</a>
+    <button onclick="document.getElementById('kly-announcement').remove()" class="absolute right-4 text-slate-400 transition hover:text-slate-700" aria-label="Dismiss">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ HERO ════════════════════════════════════ -->
+<section class="relative overflow-hidden px-4 pb-24 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
+  <!-- glow orbs (vibrant pastel) -->
+  <div class="pointer-events-none absolute -left-40 top-24 h-96 w-96 rounded-full bg-indigo-300/25 blur-[120px] cs-glow-orb"></div>
+  <div class="pointer-events-none absolute -right-32 top-32 h-72 w-72 rounded-full bg-fuchsia-300/20 blur-[100px] cs-float-delay cs-glow-orb"></div>
+  <div class="pointer-events-none absolute bottom-0 left-1/2 h-64 w-[min(90%,720px)] -translate-x-1/2 rounded-full bg-violet-200/25 blur-[90px]"></div>
 
   <div class="relative mx-auto max-w-7xl">
     <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+
+      <!-- LEFT: copy -->
       <div>
-        <p
-          class="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-3.5 py-1.5 text-xs font-medium text-emerald-300/95"
-        >
+        <!-- live badge -->
+        <p class="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1.5 text-xs font-medium text-indigo-700">
           <span class="relative flex h-2 w-2">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40"></span>
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-500 opacity-40"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
           </span>
-          Live on your site in minutes
+          Live on your site in under 10 minutes
         </p>
-        <h1 class="text-[2.35rem] font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
-          The support layer your
-          <span class="cs-text-gradient"> website deserves</span>
+
+        <!-- headline -->
+        <h1 class="text-[2.35rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-5xl lg:text-[3.4rem]">
+          Make AI your
+          <span class="cs-text-gradient">expert support agent</span>
+          — trained on your site
         </h1>
-        <p class="mt-6 max-w-lg text-lg leading-relaxed text-slate-400">
-          Train Klyro on your pages and docs. Visitors get instant, accurate answers — while you capture leads and
-          stay on brand.
+
+        <!-- subheadline -->
+        <p class="mt-6 max-w-lg text-lg leading-relaxed text-slate-500">
+          Paste a URL. Klyro crawls your content, builds a knowledge base, and gives every visitor instant, accurate answers — while you capture leads and see exactly what people want.
         </p>
+
+        <!-- CTAs -->
         <div class="mt-10 flex flex-wrap items-center gap-4">
-          <a
-            href="/signup"
-            class="cs-btn-shine inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-emerald-500/25 transition hover:scale-[1.02] hover:from-emerald-400 hover:to-teal-400"
-            >Start free — no card</a
-          >
-          <a
-            href="#features"
-            class="inline-flex items-center gap-2 rounded-2xl border border-slate-600/80 bg-slate-900/40 px-8 py-4 text-base font-medium text-slate-200 backdrop-blur-sm transition hover:border-slate-500 hover:bg-slate-800/50"
-          >
-            See what’s inside
-            <svg class="h-4 w-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
+          <a href="/signup" class="cs-btn-shine inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-indigo-500/30 transition hover:scale-[1.02] hover:from-indigo-400 hover:to-violet-500">
+            Start free — no card
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </a>
+          <a href="#features" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-8 py-4 text-base font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">
+            See how it works
           </a>
         </div>
-        <div class="mt-12 flex flex-wrap gap-x-10 gap-y-3 text-sm text-slate-500">
-          <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span> Grounded in your content
+
+        <!-- social proof microcopy -->
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <div class="flex -space-x-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-xs font-bold text-white ring-2 ring-white">A</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-purple-600 text-xs font-bold text-white ring-2 ring-white">J</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-bold text-white ring-2 ring-white">M</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-600 text-xs font-bold text-white ring-2 ring-white">R</div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span> One script to install
+          <div class="text-sm text-slate-500">
+            <span class="font-medium text-slate-900">500+</span> teams · <span class="kly-star">★★★★★</span> <span class="font-medium text-slate-900">4.9/5</span>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span> You own your data
-          </div>
+        </div>
+
+        <!-- trust checkmarks -->
+        <div class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-slate-500">
+          <div class="flex items-center gap-2"><span class="text-indigo-500">✓</span> No hallucinations</div>
+          <div class="flex items-center gap-2"><span class="text-indigo-500">✓</span> One script to install</div>
+          <div class="flex items-center gap-2"><span class="text-indigo-500">✓</span> GDPR ready</div>
         </div>
       </div>
 
-      <!-- Live agent demo (browser + widget) -->
+      <!-- RIGHT: live demo widget -->
       <div class="relative mx-auto w-full max-w-lg lg:mx-0 lg:max-w-none">
-        <div
-          class="cs-glass relative z-10 overflow-hidden rounded-2xl border border-white/[0.08] shadow-card cs-float"
-        >
-          <div
-            class="kly-device-grid flex items-center gap-2 border-b border-white/[0.06] bg-slate-900/95 px-3 py-2.5 sm:px-4"
-          >
+        <div class="relative z-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.12)] cs-float">
+          <!-- browser chrome -->
+          <div class="kly-device-grid flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2.5 sm:px-4">
             <div class="flex gap-1.5 pl-1">
-              <span class="h-2.5 w-2.5 rounded-full bg-red-500/90"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-red-400/90"></span>
               <span class="h-2.5 w-2.5 rounded-full bg-amber-400/90"></span>
               <span class="h-2.5 w-2.5 rounded-full bg-emerald-500/80"></span>
             </div>
-            <div
-              class="mx-auto flex max-w-[min(100%,280px)] flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/[0.06] bg-slate-950/80 px-3 py-1.5 text-[11px] text-slate-500"
-            >
-              <svg class="h-3 w-3 text-emerald-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+            <div class="mx-auto flex max-w-[min(100%,280px)] flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-400 shadow-sm">
+              <svg class="h-3 w-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
               <span class="truncate">acme.com</span>
             </div>
             <div class="w-14 shrink-0 sm:w-16"></div>
           </div>
-
-          <div class="border-b border-white/[0.06] bg-slate-900/60 px-4 py-3">
+          <!-- agent header -->
+          <div class="border-b border-slate-100 bg-white px-4 py-3">
             <div class="flex items-center gap-3">
-              <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 text-sm font-bold text-slate-950 shadow-inner"
-              >
-                K
-              </div>
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white shadow-inner">K</div>
               <div class="min-w-0 flex-1">
-                <p class="truncate font-semibold text-white">Klyro Assistant</p>
+                <p class="truncate font-semibold text-slate-900">Klyro Assistant</p>
                 <p class="flex items-center gap-1.5 text-xs text-slate-500">
-                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+                  <span class="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.7)]"></span>
                   Online · Trained on your site
                 </p>
               </div>
             </div>
           </div>
-
-          <div
-            id="hero-chat-messages"
-            class="kly-chat-scroll min-h-[min(300px,38vh)] max-h-[min(340px,42vh)] space-y-3 overflow-y-auto bg-gradient-to-b from-slate-950/50 to-slate-900/30 p-4 sm:min-h-[320px] sm:max-h-[360px]"
-          ></div>
-
-          <div class="border-t border-white/[0.06] bg-slate-900/70 p-3">
-            <div
-              class="flex items-center gap-2 rounded-xl border border-slate-700/60 bg-slate-950/50 px-3 py-2.5 backdrop-blur-sm"
-            >
-              <span class="flex-1 text-sm text-slate-500">Ask anything about this site…</span>
-              <span
-                class="shrink-0 rounded-lg bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-400/95"
-                >Live demo</span
-              >
+          <!-- chat messages -->
+          <div id="hero-chat-messages" class="kly-chat-scroll min-h-[min(300px,38vh)] max-h-[min(340px,42vh)] space-y-3 overflow-y-auto bg-slate-50/60 p-4 sm:min-h-[320px] sm:max-h-[360px]"></div>
+          <!-- input bar -->
+          <div class="border-t border-slate-100 bg-white p-3">
+            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+              <span class="flex-1 text-sm text-slate-400">Ask anything about this site…</span>
+              <span class="shrink-0 rounded-lg bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-indigo-600">Live demo</span>
             </div>
           </div>
         </div>
-        <div
-          class="pointer-events-none absolute -bottom-6 -right-6 -z-10 h-40 w-40 rounded-3xl bg-gradient-to-br from-emerald-500/20 via-transparent to-cyan-500/10 blur-2xl"
-        ></div>
+        <div class="pointer-events-none absolute -bottom-6 -right-6 -z-10 h-40 w-40 rounded-3xl bg-gradient-to-br from-indigo-500/20 via-transparent to-violet-500/10 blur-2xl"></div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- Trust strip -->
-<section id="trust" class="border-y border-white/[0.06] bg-slate-950/50 px-4 py-16 sm:px-6 lg:px-8">
+
+<!-- ═══════════════════════════ STATS STRIP ══════════════════════════════ -->
+<section id="trust" class="border-b border-slate-200 bg-white px-4 py-16 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <div class="grid gap-10 sm:grid-cols-3">
-      <div class="text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-white sm:text-4xl">&lt;10<span class="text-slate-500">m</span></p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">From URL to a trained assistant most teams ship in one sitting.</p>
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="kly-reveal text-center sm:text-left">
+        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <span class="kly-counter" data-counter="500">500</span><span class="text-indigo-500">+</span>
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-slate-500">Teams actively using Klyro to handle visitor questions every day.</p>
       </div>
-      <div class="text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-white sm:text-4xl">24<span class="text-slate-500">/7</span></p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Answers while you sleep — grounded in what you published, not generic fluff.</p>
+      <div class="kly-reveal kly-reveal-delay-1 text-center sm:text-left">
+        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <span class="kly-counter" data-counter="98">98</span><span class="text-violet-500">%</span>
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-slate-500">Answer accuracy on content the model was trained on. No guessing.</p>
       </div>
-      <div class="text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-white sm:text-4xl">1<span class="text-slate-500"> line</span></p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Drop in our script. Works on static sites, WordPress, Webflow, and Next.js.</p>
+      <div class="kly-reveal kly-reveal-delay-2 text-center sm:text-left">
+        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          &lt;<span class="kly-counter" data-counter="3">3</span><span class="text-slate-400">s</span>
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-slate-500">Average first response time — faster than any human support agent.</p>
       </div>
-    </div>
-    <div
-      class="mx-auto mt-14 max-w-2xl rounded-2xl border border-white/[0.08] bg-slate-900/40 p-8 text-center backdrop-blur-md sm:p-10"
-    >
-      <p class="text-lg leading-relaxed text-slate-300">
-        “We replaced a static FAQ with Klyro. Visitors self-serve on pricing and onboarding — our team finally gets
-        focused time back.”
-      </p>
-      <p class="mt-5 text-sm font-medium text-slate-500">Product lead · B2B SaaS</p>
+      <div class="kly-reveal kly-reveal-delay-3 text-center sm:text-left">
+        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <span class="text-fuchsia-500">$0</span>
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-slate-500">To get started. Free plan. No credit card. No expiry date.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Features -->
+<!-- ═══════════════════════════ FEATURES ════════════════════════════════ -->
 <section id="features" class="px-4 py-24 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <div class="mx-auto max-w-2xl text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Built to convert, not distract</h2>
-      <p class="mt-4 text-lg text-slate-400">
-        Everything visitors expect from modern support — without the enterprise price tag or engineering sprint.
-      </p>
+    <div class="kly-reveal mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Everything your visitors expect —<br class="hidden sm:block"> nothing you have to build</h2>
+      <p class="mt-4 text-lg text-slate-500">Built to convert questions into answers, answers into leads, and leads into revenue.</p>
     </div>
     <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {% set feats = [
-        ('Train on your content', 'Ingest pages and docs so every reply cites what you actually ship.', '🧠'),
-        ('Instant install', 'One embed. Styled to feel native on your marketing site or app.', '⚡'),
-        ('Lead capture', 'Collect emails and hand-offs when someone wants a human in the loop.', '📬'),
-        ('Insight-ready', 'See what people ask — so product and marketing stay aligned.', '📊')
+        ('Train on your content', 'Ingest pages and docs so every reply cites what you actually ship. No hallucinations — ever.', '🧠'),
+        ('Instant install', 'One embed tag. Styled to feel native on your site or app. Works everywhere HTML runs.', '⚡'),
+        ('Lead capture', 'Collect names and emails when visitors want a human. CRM-ready export built in.', '📬'),
+        ('Insight-ready', 'See what people ask — so product and marketing stay perfectly aligned.', '📊')
       ] %}
       {% for title, desc, icon in feats %}
-      <div
-        class="tilt-card group cs-glass rounded-2xl border border-white/[0.05] p-6 transition hover:border-emerald-500/20 hover:shadow-glow"
-        data-tilt
-      >
+      <div class="tilt-card kly-reveal kly-reveal-delay-{{ loop.index0 }} group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-indigo-200 hover:shadow-md" data-tilt>
         <div class="tilt-card-inner">
-          <div class="text-2xl opacity-90">{{ icon }}</div>
-          <h3 class="mt-4 text-lg font-semibold text-white">{{ title }}</h3>
+          <div class="text-3xl">{{ icon }}</div>
+          <h3 class="mt-4 text-lg font-semibold text-slate-900">{{ title }}</h3>
           <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ desc }}</p>
         </div>
       </div>
@@ -194,59 +185,286 @@
   </div>
 </section>
 
-<!-- How it works -->
-<section id="how" class="border-t border-white/[0.06] bg-slate-950/40 px-4 py-24 sm:px-6 lg:px-8">
+<!-- ═══════════════════════ HOW IT WORKS ════════════════════════════════ -->
+<section id="how" class="border-t border-slate-200 bg-slate-50 px-4 py-24 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <h2 class="text-center text-3xl font-bold tracking-tight text-white sm:text-4xl">How it works</h2>
-    <p class="mx-auto mt-3 max-w-lg text-center text-slate-500">Three steps. No ML PhD required.</p>
-    <div class="mt-16 grid gap-10 md:grid-cols-3">
-      <div class="relative text-center">
-        <div
-          class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/25 to-transparent text-xl font-bold text-emerald-300 ring-1 ring-emerald-500/25"
-        >
-          1
+    <div class="kly-reveal text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Up and running in 3 steps</h2>
+      <p class="mx-auto mt-3 max-w-lg text-slate-500">No ML PhD. No engineering sprint. Just paste a URL, train, and embed.</p>
+    </div>
+    <!-- connector line (desktop only) -->
+    <div class="relative mt-16">
+      <div class="pointer-events-none absolute left-[16.6%] right-[16.6%] top-8 hidden h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:block"></div>
+
+      <div class="grid gap-10 md:grid-cols-3">
+
+        <div class="kly-reveal kly-reveal-delay-0 relative text-center">
+          <!-- step circle -->
+          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+            <div class="absolute inset-0 rounded-full border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white shadow-[0_0_28px_rgba(99,102,241,0.18)]"></div>
+            <span class="relative text-2xl font-bold text-indigo-600">1</span>
+          </div>
+          <p class="inline-block rounded-full border border-indigo-200 bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-700">Under 30 seconds</p>
+          <h3 class="mt-4 text-lg font-semibold text-slate-900">Add your site</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-500">Paste a URL. We crawl, chunk, and index your public pages automatically.</p>
         </div>
-        <h3 class="mt-6 text-lg font-semibold text-white">Add your site</h3>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Paste a URL. We crawl and chunk your public pages.</p>
-        <div
-          class="pointer-events-none absolute right-0 top-8 hidden h-px w-1/2 translate-x-1/2 bg-gradient-to-r from-emerald-500/30 to-transparent md:block"
-        ></div>
-      </div>
-      <div class="relative text-center">
-        <div
-          class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/25 to-transparent text-xl font-bold text-cyan-300 ring-1 ring-cyan-500/25"
-        >
-          2
+
+        <div class="kly-reveal kly-reveal-delay-1 relative text-center">
+          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+            <div class="absolute inset-0 rounded-full border border-violet-200 bg-gradient-to-br from-violet-50 to-white shadow-[0_0_28px_rgba(139,92,246,0.18)]"></div>
+            <span class="relative text-2xl font-bold text-violet-600">2</span>
+          </div>
+          <p class="inline-block rounded-full border border-violet-200 bg-violet-50 px-3 py-0.5 text-xs font-medium text-violet-700">Fully automatic</p>
+          <h3 class="mt-4 text-lg font-semibold text-slate-900">Train & tune</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-500">Embeddings + semantic retrieval keep answers accurate and grounded in your voice.</p>
         </div>
-        <h3 class="mt-6 text-lg font-semibold text-white">Train & tune</h3>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Embeddings + retrieval keep answers accurate and on-voice.</p>
-        <div
-          class="pointer-events-none absolute right-0 top-8 hidden h-px w-1/2 translate-x-1/2 bg-gradient-to-r from-cyan-500/30 to-transparent md:block"
-        ></div>
-      </div>
-      <div class="text-center">
-        <div
-          class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-transparent text-xl font-bold text-violet-300 ring-1 ring-violet-500/25"
-        >
-          3
+
+        <div class="kly-reveal kly-reveal-delay-2 text-center">
+          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+            <div class="absolute inset-0 rounded-full border border-fuchsia-200 bg-gradient-to-br from-fuchsia-50 to-white shadow-[0_0_28px_rgba(217,70,239,0.15)]"></div>
+            <span class="relative text-2xl font-bold text-fuchsia-600">3</span>
+          </div>
+          <p class="inline-block rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 py-0.5 text-xs font-medium text-fuchsia-700">Paste once</p>
+          <h3 class="mt-4 text-lg font-semibold text-slate-900">Go live</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-500">Paste the snippet. Your assistant appears site-wide, branded to match your design.</p>
         </div>
-        <h3 class="mt-6 text-lg font-semibold text-white">Go live</h3>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Paste the snippet. Your assistant appears site-wide.</p>
+
       </div>
     </div>
   </div>
 </section>
 
-<!-- Industries -->
-<section class="px-4 py-24 sm:px-6 lg:px-8">
+<!-- ══════════════════ FEATURE SHOWCASE (scroll-flip cards) ══════════════ -->
+<section id="features-deep" class="border-t border-slate-200 px-4 py-24 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+
+    <div class="kly-reveal mb-16 text-center">
+      <p class="mb-3 text-sm font-medium uppercase tracking-widest text-indigo-600">Everything you need</p>
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">See Klyro in action</h2>
+      <p class="mt-4 text-lg text-slate-500">Four powerful capabilities. One lightweight embed.</p>
+    </div>
+
+    <div class="space-y-10">
+
+      <!-- ── Feature 1: Train ── -->
+      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
+        <!-- text -->
+        <div class="flex flex-col justify-center p-8 lg:p-12">
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-600">01</span>
+            Instant training
+          </div>
+          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Train on your entire website in minutes</h3>
+          <p class="mt-4 leading-relaxed text-slate-500">Paste any URL. Klyro crawls every linked page, extracts content, and builds a semantic retrieval index — automatically. No uploads, no tagging, no maintenance.</p>
+          <ul class="mt-6 space-y-2.5">
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-[10px]">✓</span> Multi-page crawl support</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-[10px]">✓</span> PDF &amp; doc ingestion</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-[10px]">✓</span> Auto re-trains when content updates</li>
+          </ul>
+        </div>
+        <!-- visual mockup — intentionally dark, looks like real app screenshot -->
+        <div class="flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 p-8 lg:p-10">
+          <div class="w-full max-w-sm">
+            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
+              <div class="flex items-center gap-2 border-b border-white/[0.06] bg-slate-900 px-4 py-3">
+                <div class="flex gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span><span class="h-2.5 w-2.5 rounded-full bg-amber-400/80"></span><span class="h-2.5 w-2.5 rounded-full bg-emerald-500/70"></span></div>
+                <span class="ml-2 text-xs text-slate-500">Klyro — Training</span>
+              </div>
+              <div class="p-5">
+                <p class="mb-1.5 text-[11px] font-medium text-slate-500">Website URL</p>
+                <div class="mb-4 flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-slate-900 px-3 py-2.5 text-sm text-slate-300">
+                  <svg class="h-3.5 w-3.5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                  docs.acme.com
+                </div>
+                <div class="mb-4">
+                  <div class="mb-1.5 flex items-center justify-between text-xs">
+                    <span class="font-medium text-indigo-400">Crawling pages…</span>
+                    <span class="text-slate-500">43 / 58</span>
+                  </div>
+                  <div class="h-1.5 overflow-hidden rounded-full bg-slate-800">
+                    <div class="kly-progress-bar h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" style="width:74%"></div>
+                  </div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2 text-xs text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span>pricing.acme.com — indexed</div>
+                  <div class="flex items-center gap-2 text-xs text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span>docs.acme.com/api — indexed</div>
+                  <div class="flex animate-pulse items-center gap-2 text-xs text-slate-500"><span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>docs.acme.com/faq — processing…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Feature 2: Accurate answers ── -->
+      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
+        <!-- visual first on desktop (reversed) — stays dark -->
+        <div class="order-last flex items-center justify-center bg-gradient-to-bl from-slate-800 via-slate-900 to-slate-950 p-8 lg:order-first lg:p-10">
+          <div class="w-full max-w-sm">
+            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
+              <div class="flex items-center gap-3 border-b border-white/[0.06] bg-slate-900/80 px-4 py-3">
+                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white">K</div>
+                <div><p class="text-xs font-semibold text-white">Klyro Assistant</p><p class="text-[10px] text-indigo-400">● Online · Trained on your site</p></div>
+              </div>
+              <div class="space-y-3 p-4">
+                <div class="flex justify-end">
+                  <div class="max-w-[80%] rounded-2xl rounded-tr-sm bg-slate-700/60 px-3.5 py-2.5 text-xs text-slate-200">What's your refund policy?</div>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-[9px] font-bold text-white">K</div>
+                  <div class="max-w-[80%] space-y-2 rounded-2xl rounded-tl-sm bg-slate-800/80 px-3.5 py-2.5 text-xs text-slate-300">
+                    <p>We offer a <span class="font-semibold text-indigo-400">14-day full refund</span> on all plans — no questions asked.</p>
+                    <div class="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-slate-900/70 px-2.5 py-1.5 text-[10px] text-slate-500">
+                      <svg class="h-3 w-3 shrink-0 text-indigo-500/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656"/></svg>
+                      Source: acme.com/refunds
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="border-t border-white/[0.05] bg-slate-900/50 px-4 py-2.5">
+                <div class="rounded-xl border border-white/[0.06] bg-slate-950/50 px-3 py-2 text-xs text-slate-600">Ask anything about this site…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- text -->
+        <div class="flex flex-col justify-center p-8 lg:p-12">
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3.5 py-1.5 text-xs font-semibold text-sky-700">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-100 text-[10px] font-bold text-sky-600">02</span>
+            Accurate answers
+          </div>
+          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Zero hallucinations. Grounded in your content.</h3>
+          <p class="mt-4 leading-relaxed text-slate-500">Every response is retrieved from your indexed content — not the model's imagination. If the answer isn't in your docs, Klyro says so and routes the visitor to you.</p>
+          <ul class="mt-6 space-y-2.5">
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 text-[10px]">✓</span> RAG-powered semantic retrieval</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 text-[10px]">✓</span> Source citations in every reply</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 text-[10px]">✓</span> Graceful fallback to human</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ── Feature 3: Lead capture ── -->
+      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
+        <!-- text -->
+        <div class="flex flex-col justify-center p-8 lg:p-12">
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3.5 py-1.5 text-xs font-semibold text-violet-700">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-violet-100 text-[10px] font-bold text-violet-600">03</span>
+            Lead capture
+          </div>
+          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Turn curious visitors into qualified leads — automatically.</h3>
+          <p class="mt-4 leading-relaxed text-slate-500">When a visitor asks something outside your docs or wants a human, Klyro captures their name and email inline — no popup, no separate form, zero friction.</p>
+          <ul class="mt-6 space-y-2.5">
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 text-[10px]">✓</span> In-chat lead form</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 text-[10px]">✓</span> CSV &amp; CRM-ready export</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 text-[10px]">✓</span> Triggered by real intent signals</li>
+          </ul>
+        </div>
+        <!-- visual — stays dark (product mockup) -->
+        <div class="flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 p-8 lg:p-10">
+          <div class="w-full max-w-sm">
+            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
+              <div class="flex items-center gap-3 border-b border-white/[0.06] bg-slate-900/80 px-4 py-3">
+                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-xs font-bold text-white">K</div>
+                <div><p class="text-xs font-semibold text-white">Klyro Assistant</p><p class="text-[10px] text-violet-400">● Online</p></div>
+              </div>
+              <div class="space-y-3 p-4">
+                <div class="flex items-start gap-2">
+                  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-[9px] font-bold text-white">K</div>
+                  <div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-800/80 px-3.5 py-2.5 text-xs text-slate-300">I'd love to connect you with our team! Drop your email and we'll follow up within the hour.</div>
+                </div>
+                <div class="ml-8 rounded-2xl border border-violet-500/20 bg-violet-950/30 p-3.5 space-y-2">
+                  <div class="rounded-lg border border-white/[0.08] bg-slate-900 px-3 py-2 text-xs text-slate-400">sarah@startup.io</div>
+                  <button class="w-full rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 py-2 text-xs font-semibold text-white">Send — get in touch →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Feature 4: Analytics ── -->
+      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
+        <!-- visual first (reversed) — stays dark (product mockup) -->
+        <div class="order-last flex items-center justify-center bg-gradient-to-bl from-slate-800 via-slate-900 to-slate-950 p-8 lg:order-first lg:p-10">
+          <div class="w-full max-w-sm">
+            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
+              <div class="flex items-center justify-between border-b border-white/[0.06] bg-slate-900 px-4 py-3">
+                <span class="text-xs font-semibold text-white">Analytics — Last 30 days</span>
+                <span class="text-[10px] text-slate-500">Klyro</span>
+              </div>
+              <div class="p-4">
+                <div class="mb-4 grid grid-cols-3 gap-2">
+                  <div class="rounded-xl border border-white/[0.05] bg-slate-900 p-2.5 text-center">
+                    <p class="text-base font-bold text-white">1.2k</p>
+                    <p class="mt-0.5 text-[9px] text-slate-500">Convos</p>
+                  </div>
+                  <div class="rounded-xl border border-white/[0.05] bg-slate-900 p-2.5 text-center">
+                    <p class="text-base font-bold text-sky-400">94%</p>
+                    <p class="mt-0.5 text-[9px] text-slate-500">Answered</p>
+                  </div>
+                  <div class="rounded-xl border border-white/[0.05] bg-slate-900 p-2.5 text-center">
+                    <p class="text-base font-bold text-violet-400">47</p>
+                    <p class="mt-0.5 text-[9px] text-slate-500">Leads</p>
+                  </div>
+                </div>
+                <p class="mb-2 text-[10px] uppercase tracking-widest text-slate-600">Top questions</p>
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2 text-xs">
+                    <div class="min-w-0 flex-1 truncate rounded-lg border border-white/[0.04] bg-slate-900 px-2.5 py-1.5 text-slate-300">How does billing work?</div>
+                    <span class="shrink-0 text-slate-500">127×</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs">
+                    <div class="min-w-0 flex-1 truncate rounded-lg border border-white/[0.04] bg-slate-900 px-2.5 py-1.5 text-slate-300">What's the refund policy?</div>
+                    <span class="shrink-0 text-slate-500">84×</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs">
+                    <div class="min-w-0 flex-1 truncate rounded-lg border border-white/[0.04] bg-slate-900 px-2.5 py-1.5 text-slate-300">Can I export my data?</div>
+                    <span class="shrink-0 text-slate-500">61×</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- text -->
+        <div class="flex flex-col justify-center p-8 lg:p-12">
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-1.5 text-xs font-semibold text-amber-700">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-600">04</span>
+            Analytics
+          </div>
+          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Know exactly what your visitors want to know.</h3>
+          <p class="mt-4 leading-relaxed text-slate-500">The Klyro dashboard surfaces your most-asked questions, unanswered queries, and lead conversion data — so product and content teams stay perfectly aligned.</p>
+          <ul class="mt-6 space-y-2.5">
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px]">✓</span> Top questions by volume</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px]">✓</span> Unanswered query log</li>
+            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px]">✓</span> Conversion &amp; lead metrics</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ INDUSTRIES ═══════════════════════════════ -->
+<section class="border-t border-slate-200 bg-slate-50 px-4 py-24 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <h2 class="text-center text-3xl font-bold tracking-tight text-white">Where teams use Klyro</h2>
-    <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {% for label, sub in [('SaaS', 'PLG & enterprise funnels'), ('Agencies', 'Client sites at scale'), ('Real estate', 'Listings & tours'), ('Education', 'Courses & FAQs')] %}
-      <div
-        class="cs-glass rounded-2xl border border-white/[0.05] px-6 py-8 text-center transition hover:border-emerald-500/25 hover:shadow-glow"
-      >
-        <p class="text-lg font-semibold text-white">{{ label }}</p>
+    <div class="kly-reveal mb-12 text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900">Where teams use Klyro</h2>
+      <p class="mt-3 text-slate-500">Any website. Any stack. One embed.</p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {% for icon, label, sub in [
+        ('🚀', 'SaaS',                  'Handle pricing Q&amp;As and onboarding FAQs automatically'),
+        ('🏢', 'Agencies',              'Deploy for every client from a single dashboard'),
+        ('🏠', 'Real Estate',           'Answer listing questions and book tours 24/7'),
+        ('🎓', 'Education',             'Student support at scale — no extra staff needed'),
+        ('🛍️', 'E-commerce',           'Product questions, sizing, shipping — instant answers'),
+        ('⚖️', 'Professional Services', 'Legal, finance, healthcare — accurate info, fast')
+      ] %}
+      <div class="kly-reveal rounded-2xl border border-slate-200 bg-white px-6 py-7 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
+        <div class="mb-3 text-2xl">{{ icon }}</div>
+        <p class="text-base font-semibold text-slate-900">{{ label }}</p>
         <p class="mt-1 text-sm text-slate-500">{{ sub }}</p>
       </div>
       {% endfor %}
@@ -254,52 +472,119 @@
   </div>
 </section>
 
-<!-- Pricing preview -->
-<section class="border-t border-white/[0.06] px-4 py-24 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-3xl text-center">
-    <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Simple, honest pricing</h2>
-    <p class="mt-4 text-slate-400">Start free. Upgrade when volume and branding matter — billing hooks are ready when you are.</p>
+<!-- ═══════════════════════ PRICING PREVIEW ═════════════════════════════ -->
+<section class="border-t border-slate-200 px-4 py-24 sm:px-6 lg:px-8">
+  <div class="kly-reveal mx-auto max-w-3xl text-center">
+    <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Start free. Scale when you're ready.</h2>
+    <p class="mt-4 text-slate-500">No credit card required. Free plan never expires. Upgrade only when volume or custom branding matter.</p>
     <div class="mt-10 flex flex-wrap justify-center gap-4">
-      <a
-        href="/pricing"
-        class="rounded-2xl border border-slate-600/80 px-8 py-4 font-semibold text-white transition hover:border-emerald-500/40 hover:bg-emerald-500/10"
-        >Compare plans</a
-      >
-      <a
-        href="/signup"
-        class="rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
-        >Create your assistant</a
-      >
+      <a href="/pricing" class="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-semibold text-slate-700 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">Compare plans →</a>
+      <a href="/signup" class="cs-btn-shine rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-8 py-4 font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-400 hover:to-violet-500">Build my first chatbot free</a>
+    </div>
+    <p class="mt-5 text-sm text-slate-400">Free plan · 1 chatbot · No expiry · No card required</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FAQ ══════════════════════════════════════ -->
+<section id="faq" class="border-t border-slate-200 bg-slate-50 px-4 py-24 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-3xl">
+    <div class="kly-reveal mb-14 text-center">
+      <p class="mb-3 text-sm font-medium uppercase tracking-widest text-indigo-600">Got questions?</p>
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Frequently asked</h2>
+    </div>
+
+    <div class="space-y-2.5">
+      {% set faqs = [
+        (
+          'Does Klyro hallucinate?',
+          'No. Klyro is grounded exclusively in the content you train it on. It only answers from what it knows — if a question falls outside your content, it says so politely and suggests the visitor contact you directly. Zero made-up facts.'
+        ),
+        (
+          'How long does training take?',
+          'Most sites are ready in under 10 minutes. We crawl your pages, chunk the text, generate embeddings, and build the retrieval index — all automatically. Larger documentation libraries (1,000+ pages) may take up to 30 minutes.'
+        ),
+        (
+          'Does it work on my stack (Webflow, WordPress, Next.js, Shopify)?',
+          'Yes. The Klyro widget is a single script tag — it works on Webflow, Next.js, WordPress, Shopify, Framer, plain HTML, and anything else that lets you embed a script. No framework lock-in whatsoever.'
+        ),
+        (
+          'What happens to my content and data?',
+          'Your content is encrypted at rest and in transit. We never share it with other customers or use it to train shared models. You can delete any chatbot and its entire index from the dashboard at any time — it is gone permanently.'
+        ),
+        (
+          'Can I customize how the widget looks?',
+          'Pro users can set custom colors, a custom greeting message, a custom avatar, and the widget position on the page. The widget is designed to feel native — visitors often assume it was built in-house by your team.'
+        ),
+        (
+          'What counts as a conversation?',
+          'A conversation is one complete visitor session — from the first message to the last, regardless of how many back-and-forth exchanges happen. Ten messages in one visit = 1 conversation toward your monthly quota.'
+        ),
+        (
+          'Is there an API I can use?',
+          'Yes. The full REST API is available on all plans. You can create chatbots, ingest content, query the assistant programmatically, and pull analytics data. Full documentation is in our developer guide.'
+        )
+      ] %}
+
+      {% for question, answer in faqs %}
+      <div class="kly-faq-item kly-reveal overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button class="kly-faq-btn group flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+          <span class="font-medium text-slate-900 transition-colors group-hover:text-indigo-600">{{ question }}</span>
+          <span class="kly-faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-400 transition-all group-hover:border-indigo-200 group-hover:text-indigo-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          </span>
+        </button>
+        <div class="kly-faq-answer">
+          <p class="px-6 pb-5 text-sm leading-relaxed text-slate-500">{{ answer }}</p>
+        </div>
+      </div>
+      {% endfor %}
+
     </div>
   </div>
 </section>
 
-<!-- CTA -->
+<!-- ═══════════════════════════ FINAL CTA (intentionally dark for contrast) ══════════════ -->
 <section class="px-4 pb-28 sm:px-6 lg:px-8">
-  <div
-    class="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-emerald-500/25 bg-gradient-to-br from-emerald-950/90 via-slate-900 to-slate-950 p-12 text-center shadow-glow sm:p-16"
-  >
-    <div class="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-emerald-500/20 blur-[80px]"></div>
-    <div class="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-cyan-500/15 blur-[70px]"></div>
+  <div class="kly-reveal relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-indigo-600/30 bg-gradient-to-br from-indigo-900 via-violet-900 to-slate-900 p-12 text-center shadow-[0_32px_80px_-16px_rgba(99,102,241,0.35)] sm:p-16">
+    <div class="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-violet-400/20 blur-[80px]"></div>
+    <div class="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-fuchsia-400/15 blur-[70px]"></div>
     <div class="relative">
-      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready when your visitors are</h2>
-      <p class="mx-auto mt-4 max-w-xl text-slate-400">
-        Join teams using an assistant that knows the product — not a generic chatbot parroting the internet.
-      </p>
-      <a
-        href="/signup"
-        class="mt-10 inline-flex rounded-2xl bg-white px-10 py-4 text-base font-bold text-slate-900 shadow-xl transition hover:bg-emerald-50"
-        >Get started free</a
-      >
+      <!-- badge -->
+      <div class="mb-6 flex justify-center">
+        <div class="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-400/10 px-4 py-1.5 text-sm text-indigo-300">
+          <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400"></span>
+          500+ teams are already live
+        </div>
+      </div>
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Your visitors are asking questions right now.<br class="hidden sm:block"> Are you answering them?</h2>
+      <p class="mx-auto mt-4 max-w-xl text-slate-300">Join teams that replaced generic chatbots with an assistant that actually knows the product — grounded in your content, live in minutes.</p>
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <a href="/signup" class="cs-btn-shine inline-flex items-center gap-2 rounded-2xl bg-white px-10 py-4 text-base font-bold text-slate-900 shadow-xl transition hover:bg-indigo-50">
+          Build my first chatbot free →
+        </a>
+        <a href="/pricing" class="rounded-2xl border border-white/20 bg-white/5 px-8 py-4 text-base font-medium text-white backdrop-blur-sm transition hover:bg-white/10">
+          Compare plans
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-slate-400">No credit card · Free plan · Cancel anytime</p>
+      <div class="mt-4 flex items-center justify-center gap-1.5 text-sm">
+        <span class="kly-star">★★★★★</span>
+        <span class="text-slate-400">4.9/5 from 120+ reviews</span>
+      </div>
     </div>
   </div>
 </section>
+
 {% endblock %}
 {% block scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    if (window.CS && window.CS.initHeroLiveChat) window.CS.initHeroLiveChat();
-    if (window.CS && window.CS.initTiltCards) window.CS.initTiltCards();
+    if (window.CS && window.CS.initHeroLiveChat)  window.CS.initHeroLiveChat();
+    if (window.CS && window.CS.initTiltCards)     window.CS.initTiltCards();
+    if (window.CS && window.CS.initFaqAccordion)  window.CS.initFaqAccordion();
+    if (window.CS && window.CS.initScrollReveal)  window.CS.initScrollReveal();
+    if (window.CS && window.CS.initCounters)      window.CS.initCounters();
+    if (window.CS && window.CS.initFlipCards)     window.CS.initFlipCards();
   });
 </script>
 {% endblock %}
