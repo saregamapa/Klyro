@@ -45,7 +45,7 @@
     if (!root) return;
     var el = document.createElement("div");
     el.className =
-      "cs-toast-item rounded-xl border px-4 py-3 text-sm shadow-lg " +
+      "kly-toast-item cs-toast-item rounded-xl border px-4 py-3 text-sm shadow-lg " +
       (type === "error"
         ? "border-red-500/40 bg-red-950/90 text-red-100"
         : type === "success"
@@ -96,10 +96,12 @@
       typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     var avatarAgent =
-      '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white">K</div>';
+      '<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-violet-600 text-xs font-bold text-white">K</div>';
     var bubbleAgent =
-      "max-w-[88%] rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm leading-relaxed text-slate-700 shadow-sm";
-    var bubbleUser = "max-w-[88%] rounded-2xl rounded-br-md bg-gradient-to-br from-indigo-500 to-violet-600 px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-md";
+      "max-w-[88%] rounded-2xl rounded-bl-md border px-3.5 py-2.5 text-sm leading-relaxed shadow-sm";
+    var bubbleAgentStyle = "border-color:rgba(148,163,184,0.12);background:rgba(10,22,40,0.9);color:#cbd5e1";
+    var bubbleUser = "max-w-[88%] rounded-2xl rounded-br-md px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-md";
+    var bubbleUserStyle = "background:linear-gradient(135deg,#06b6d4,#8b5cf6)";
 
     function scrollToBottom() {
       root.scrollTop = root.scrollHeight;
@@ -113,6 +115,8 @@
         avatarAgent +
         '<div class="' +
         bubbleAgent +
+        '" style="' +
+        bubbleAgentStyle +
         '">' +
         escapeHtml(text) +
         "</div></div>";
@@ -123,7 +127,7 @@
     function addUser(text) {
       var row = document.createElement("div");
       row.className = "flex justify-end kly-hero-msg";
-      row.innerHTML = '<div class="' + bubbleUser + '">' + escapeHtml(text) + "</div>";
+      row.innerHTML = '<div class="' + bubbleUser + '" style="' + bubbleUserStyle + '">' + escapeHtml(text) + "</div>";
       root.appendChild(row);
       scrollToBottom();
     }
@@ -138,10 +142,10 @@
       row.innerHTML =
         '<div class="flex items-end gap-2">' +
         avatarAgent +
-        '<div class="flex gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 shadow-sm">' +
-        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-300" style="animation-delay:0ms"></span>' +
-        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-300" style="animation-delay:120ms"></span>' +
-        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-300" style="animation-delay:240ms"></span>' +
+        '<div class="flex gap-1 rounded-2xl rounded-bl-md border px-4 py-3 shadow-sm" style="border-color:rgba(148,163,184,0.12);background:rgba(10,22,40,0.9)">' +
+        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400/60" style="animation-delay:0ms"></span>' +
+        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400/60" style="animation-delay:120ms"></span>' +
+        '<span class="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-400/60" style="animation-delay:240ms"></span>' +
         "</div></div>";
       root.appendChild(row);
       scrollToBottom();
@@ -305,5 +309,81 @@
     );
 
     cards.forEach(function (card) { obs.observe(card); });
+  };
+
+  window.CS.initHeroGsap = function () {
+    if (!window.gsap) return;
+    var tl = gsap.timeline({ delay: 0.1 });
+    tl.from('#kly-hero-badge', { opacity: 0, y: 20, duration: 0.6, ease: 'power3.out' })
+      .from('#kly-hero-h1 .kly-h1-line', {
+        opacity: 0, y: 40, stagger: 0.12, duration: 0.8, ease: 'power3.out'
+      }, '-=0.3')
+      .from('#kly-hero-sub', { opacity: 0, y: 20, duration: 0.6, ease: 'power3.out' }, '-=0.4')
+      .from('#kly-hero-ctas', { opacity: 0, y: 16, duration: 0.5, ease: 'power3.out' }, '-=0.3')
+      .from('#kly-hero-proof', { opacity: 0, y: 12, duration: 0.4, ease: 'power3.out' }, '-=0.2')
+      .from('#kly-hero-widget', { opacity: 0, x: 40, duration: 0.9, ease: 'power3.out' }, '-=0.7');
+  };
+
+  window.CS.initGsapScroll = function () {
+    if (!window.gsap || !window.ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray('.kly-bento').forEach(function (el, i) {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        opacity: 0, y: 40, scale: 0.97,
+        duration: 0.7, delay: i * 0.06, ease: 'power3.out'
+      });
+    });
+
+    gsap.utils.toArray('.kly-pricing-card').forEach(function (el, i) {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+        opacity: 0, y: 50, duration: 0.75, delay: i * 0.1, ease: 'power3.out'
+      });
+    });
+
+    gsap.utils.toArray('.kly-section-head').forEach(function (el) {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+        opacity: 0, y: 30, duration: 0.7, ease: 'power3.out'
+      });
+    });
+  };
+
+  window.CS.initMagnetic = function () {
+    document.querySelectorAll('.kly-magnetic').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var rect = btn.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2;
+        var cy = rect.top + rect.height / 2;
+        var dx = (e.clientX - cx) * 0.35;
+        var dy = (e.clientY - cy) * 0.35;
+        btn.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      });
+      btn.addEventListener('mouseleave', function () {
+        btn.style.transform = '';
+      });
+    });
+  };
+
+  window.CS.initGsapCounters = function () {
+    if (!window.gsap || !window.ScrollTrigger) return;
+    document.querySelectorAll('.kly-gsap-counter').forEach(function (el) {
+      var target = parseFloat(el.dataset.target || el.textContent);
+      var prefix = el.dataset.prefix || '';
+      var suffix = el.dataset.suffix || '';
+      ScrollTrigger.create({
+        trigger: el, start: 'top 85%', once: true,
+        onEnter: function () {
+          gsap.from({ n: 0 }, {
+            n: target, duration: 2, ease: 'power2.out',
+            onUpdate: function () {
+              el.textContent = prefix + Math.round(this.targets()[0].n).toLocaleString() + suffix;
+            }
+          });
+        }
+      });
+    });
   };
 })();

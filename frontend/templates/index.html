@@ -3,181 +3,289 @@
 {% block content %}
 
 <!-- ═══════════════════════════ ANNOUNCEMENT BAR ════════════════════════════ -->
-<div id="kly-announcement" class="kly-announcement relative z-40 border-b border-indigo-200 bg-gradient-to-r from-indigo-50 via-white to-violet-50 px-4 py-2.5">
-  <div class="mx-auto flex max-w-7xl items-center justify-center gap-3 text-sm">
-    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500"></span>
-    <span class="text-slate-600">🎉 <span class="font-medium text-slate-900">Multi-page crawl</span> is now live — train on your entire docs site in one click.</span>
-    <a href="/signup" class="whitespace-nowrap font-medium text-indigo-600 hover:underline">Try it free →</a>
-    <button onclick="document.getElementById('kly-announcement').remove()" class="absolute right-4 text-slate-400 transition hover:text-slate-700" aria-label="Dismiss">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-  </div>
+<div id="kly-announcement" class="kly-announcement relative z-40 border-b py-2.5 px-4 text-center text-sm"
+     style="background:linear-gradient(90deg,rgba(6,182,212,0.06),rgba(139,92,246,0.06),rgba(6,182,212,0.06));border-color:rgba(148,163,184,0.08)">
+  <span class="inline-flex items-center gap-2" style="color:#94a3b8">
+    <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-50"></span><span class="relative flex h-2 w-2 rounded-full bg-cyan-400"></span></span>
+    <span style="color:#cbd5e1">🚀 <strong style="color:#f1f5f9">Multi-page crawl</strong> is now live — train on your entire docs site in one click.</span>
+    <a href="/signup" style="color:#22d3ee" class="font-medium hover:underline whitespace-nowrap">Try it free →</a>
+  </span>
+  <button onclick="document.getElementById('kly-announcement').remove()" class="absolute right-4 top-1/2 -translate-y-1/2 transition" style="color:#475569" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'" aria-label="Dismiss">
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
 </div>
 
 <!-- ═══════════════════════════════ HERO ════════════════════════════════════ -->
-<section class="relative overflow-hidden px-4 pb-24 pt-14 sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
-  <!-- glow orbs (vibrant pastel) -->
-  <div class="pointer-events-none absolute -left-40 top-24 h-96 w-96 rounded-full bg-indigo-300/25 blur-[120px] cs-glow-orb"></div>
-  <div class="pointer-events-none absolute -right-32 top-32 h-72 w-72 rounded-full bg-fuchsia-300/20 blur-[100px] cs-float-delay cs-glow-orb"></div>
-  <div class="pointer-events-none absolute bottom-0 left-1/2 h-64 w-[min(90%,720px)] -translate-x-1/2 rounded-full bg-violet-200/25 blur-[90px]"></div>
+<section class="relative min-h-screen overflow-hidden flex items-center">
+  <canvas id="kly-hero-canvas"></canvas>
 
-  <div class="relative mx-auto max-w-7xl">
-    <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+  <div class="kly-aurora-1 pointer-events-none absolute -left-32 top-20 h-[500px] w-[500px]"></div>
+  <div class="kly-aurora-2 pointer-events-none absolute right-0 top-40 h-[400px] w-[400px]"></div>
+  <div class="kly-aurora-3 pointer-events-none absolute bottom-0 left-1/3 h-[300px] w-[600px]"></div>
 
-      <!-- LEFT: copy -->
+  <div class="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+    <div class="grid items-center gap-16 lg:grid-cols-[1fr_1fr] lg:gap-20">
+
       <div>
-        <!-- live badge -->
-        <p class="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1.5 text-xs font-medium text-indigo-700">
-          <span class="relative flex h-2 w-2">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-500 opacity-40"></span>
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
-          </span>
+        <div id="kly-hero-badge" class="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium"
+             style="background:rgba(6,182,212,0.06);border-color:rgba(6,182,212,0.25);color:#22d3ee">
+          <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-60"></span><span class="relative flex h-2 w-2 rounded-full bg-cyan-400"></span></span>
           Live on your site in under 10 minutes
-        </p>
+        </div>
 
-        <!-- headline -->
-        <h1 class="text-[2.35rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-5xl lg:text-[3.4rem]">
-          Make AI your
-          <span class="cs-text-gradient">expert support agent</span>
-          — trained on your site
+        <h1 id="kly-hero-h1" class="text-5xl font-black tracking-tight leading-[1.04] sm:text-6xl lg:text-[4rem] xl:text-[4.5rem]">
+          <span class="kly-h1-line block" style="color:#f8fafc">Make AI your</span>
+          <span class="kly-h1-line block cs-text-gradient">expert support</span>
+          <span class="kly-h1-line block" style="color:#f8fafc">agent</span>
         </h1>
 
-        <!-- subheadline -->
-        <p class="mt-6 max-w-lg text-lg leading-relaxed text-slate-500">
-          Paste a URL. Klyro crawls your content, builds a knowledge base, and gives every visitor instant, accurate answers — while you capture leads and see exactly what people want.
+        <p id="kly-hero-sub" class="mt-6 max-w-[520px] text-lg leading-relaxed" style="color:#94a3b8">
+          Paste a URL. Klyro crawls your content, builds a knowledge base, and gives every visitor instant answers — while you capture leads automatically.
         </p>
 
-        <!-- CTAs -->
-        <div class="mt-10 flex flex-wrap items-center gap-4">
-          <a href="/signup" class="cs-btn-shine inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-indigo-500/30 transition hover:scale-[1.02] hover:from-indigo-400 hover:to-violet-500">
+        <div id="kly-hero-ctas" class="mt-10 flex flex-wrap items-center gap-4">
+          <a href="/signup" class="kly-btn-primary kly-magnetic text-base px-8 py-4">
             Start free — no card
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
           </a>
-          <a href="#features" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-8 py-4 text-base font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">
-            See how it works
-          </a>
+          <a href="#features" class="kly-btn-ghost kly-magnetic text-base px-8 py-4">See how it works</a>
         </div>
 
-        <!-- social proof microcopy -->
-        <div class="mt-8 flex flex-wrap items-center gap-3">
+        <div id="kly-hero-proof" class="mt-8 flex flex-wrap items-center gap-4">
           <div class="flex -space-x-2">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-xs font-bold text-white ring-2 ring-white">A</div>
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-purple-600 text-xs font-bold text-white ring-2 ring-white">J</div>
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-bold text-white ring-2 ring-white">M</div>
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-600 text-xs font-bold text-white ring-2 ring-white">R</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full ring-2 text-xs font-bold text-white" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);--tw-ring-color:#060d1a">A</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full ring-2 text-xs font-bold text-white" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);--tw-ring-color:#060d1a">J</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full ring-2 text-xs font-bold text-white" style="background:linear-gradient(135deg,#f59e0b,#ef4444);--tw-ring-color:#060d1a">M</div>
+            <div class="flex h-8 w-8 items-center justify-center rounded-full ring-2 text-xs font-bold text-white" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);--tw-ring-color:#060d1a">R</div>
           </div>
-          <div class="text-sm text-slate-500">
-            <span class="font-medium text-slate-900">500+</span> teams · <span class="kly-star">★★★★★</span> <span class="font-medium text-slate-900">4.9/5</span>
+          <span class="text-sm" style="color:#94a3b8">
+            <span class="font-semibold" style="color:#f8fafc">500+</span> teams
+            <span class="ml-2 text-amber-400">★★★★★</span>
+            <span class="font-semibold" style="color:#f8fafc"> 4.9/5</span>
+          </span>
+          <div class="flex items-center gap-4 text-sm" style="color:#475569">
+            <span class="flex items-center gap-1.5"><span style="color:#22d3ee">✓</span> GDPR ready</span>
+            <span class="flex items-center gap-1.5"><span style="color:#22d3ee">✓</span> 1-script install</span>
           </div>
-        </div>
-
-        <!-- trust checkmarks -->
-        <div class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-slate-500">
-          <div class="flex items-center gap-2"><span class="text-indigo-500">✓</span> No hallucinations</div>
-          <div class="flex items-center gap-2"><span class="text-indigo-500">✓</span> One script to install</div>
-          <div class="flex items-center gap-2"><span class="text-indigo-500">✓</span> GDPR ready</div>
         </div>
       </div>
 
-      <!-- RIGHT: live demo widget -->
-      <div class="relative mx-auto w-full max-w-lg lg:mx-0 lg:max-w-none">
-        <div class="relative z-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.12)] cs-float">
-          <!-- browser chrome -->
-          <div class="kly-device-grid flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2.5 sm:px-4">
+      <div id="kly-hero-widget" class="relative mx-auto w-full max-w-lg lg:mx-0">
+        <div class="absolute -inset-4 rounded-3xl opacity-30" style="background:radial-gradient(ellipse,rgba(6,182,212,0.25) 0%,transparent 70%)"></div>
+
+        <div class="cs-float relative z-10 overflow-hidden rounded-2xl border shadow-2xl" style="background:#060d1a;border-color:rgba(148,163,184,0.12);box-shadow:0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(6,182,212,0.08)">
+          <div class="flex items-center gap-2 border-b px-3 py-2.5" style="background:#0a1628;border-color:rgba(148,163,184,0.08)">
             <div class="flex gap-1.5 pl-1">
-              <span class="h-2.5 w-2.5 rounded-full bg-red-400/90"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-amber-400/90"></span>
-              <span class="h-2.5 w-2.5 rounded-full bg-emerald-500/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full" style="background:#ef4444;opacity:0.7"></span>
+              <span class="h-2.5 w-2.5 rounded-full" style="background:#f59e0b;opacity:0.7"></span>
+              <span class="h-2.5 w-2.5 rounded-full" style="background:#10b981;opacity:0.7"></span>
             </div>
-            <div class="mx-auto flex max-w-[min(100%,280px)] flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-400 shadow-sm">
-              <svg class="h-3 w-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              <span class="truncate">acme.com</span>
-            </div>
-            <div class="w-14 shrink-0 sm:w-16"></div>
-          </div>
-          <!-- agent header -->
-          <div class="border-b border-slate-100 bg-white px-4 py-3">
-            <div class="flex items-center gap-3">
-              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white shadow-inner">K</div>
-              <div class="min-w-0 flex-1">
-                <p class="truncate font-semibold text-slate-900">Klyro Assistant</p>
-                <p class="flex items-center gap-1.5 text-xs text-slate-500">
-                  <span class="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.7)]"></span>
-                  Online · Trained on your site
-                </p>
-              </div>
+            <div class="mx-auto flex flex-1 items-center justify-center gap-1.5 rounded-md border px-3 py-1 text-[11px] max-w-[240px]" style="border-color:rgba(148,163,184,0.10);background:rgba(15,30,53,0.8);color:#475569">
+              <svg class="h-3 w-3" style="color:#06b6d4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              acme.com
             </div>
           </div>
-          <!-- chat messages -->
-          <div id="hero-chat-messages" class="kly-chat-scroll min-h-[min(300px,38vh)] max-h-[min(340px,42vh)] space-y-3 overflow-y-auto bg-slate-50/60 p-4 sm:min-h-[320px] sm:max-h-[360px]"></div>
-          <!-- input bar -->
-          <div class="border-t border-slate-100 bg-white p-3">
-            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
-              <span class="flex-1 text-sm text-slate-400">Ask anything about this site…</span>
-              <span class="shrink-0 rounded-lg bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-indigo-600">Live demo</span>
+          <div class="flex items-center gap-3 border-b px-4 py-3" style="border-color:rgba(148,163,184,0.07)">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold text-sm text-white" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6)">K</div>
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold text-sm" style="color:#f8fafc">Klyro Assistant</p>
+              <p class="flex items-center gap-1.5 text-xs" style="color:#475569">
+                <span class="h-1.5 w-1.5 rounded-full bg-cyan-400" style="box-shadow:0 0 6px rgba(6,182,212,0.8)"></span>
+                Online · Trained on your site
+              </p>
+            </div>
+            <span class="rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wide" style="background:rgba(6,182,212,0.12);color:#22d3ee">Live demo</span>
+          </div>
+          <div id="hero-chat-messages" class="kly-chat-scroll min-h-[280px] max-h-[320px] space-y-3 overflow-y-auto p-4 text-sm" style="background:rgba(3,7,18,0.5)"></div>
+          <div class="border-t p-3" style="border-color:rgba(148,163,184,0.07)">
+            <div class="flex items-center gap-2 rounded-xl border px-3 py-2.5" style="background:rgba(10,22,40,0.7);border-color:rgba(148,163,184,0.10)">
+              <span class="flex-1 text-sm" style="color:#334155">Ask anything about this site…</span>
             </div>
           </div>
         </div>
-        <div class="pointer-events-none absolute -bottom-6 -right-6 -z-10 h-40 w-40 rounded-3xl bg-gradient-to-br from-indigo-500/20 via-transparent to-violet-500/10 blur-2xl"></div>
       </div>
+    </div>
+  </div>
 
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce" style="color:#334155">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/></svg>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ TRUST LOGOS ════════════════════════════════ -->
+<section id="trust" class="overflow-hidden border-y py-10" style="border-color:rgba(148,163,184,0.08);background:rgba(6,13,26,0.5)">
+  <p class="mb-6 text-center text-xs font-medium uppercase tracking-[0.15em]" style="color:#475569">Trusted by teams at</p>
+  <div class="relative">
+    <div class="kly-marquee-track items-center gap-16 px-8">
+      {% for logo in ['Vercel','Linear','Notion','Stripe','Figma','Webflow','Shopify','Framer','Vercel','Linear','Notion','Stripe','Figma','Webflow','Shopify','Framer'] %}
+      <span class="shrink-0 text-lg font-semibold tracking-tight" style="color:#334155">{{ logo }}</span>
+      {% endfor %}
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════════════ STATS STRIP ══════════════════════════════ -->
-<section id="trust" class="border-b border-slate-200 bg-white px-4 py-16 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-7xl">
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="kly-reveal text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          <span class="kly-counter" data-counter="500">500</span><span class="text-indigo-500">+</span>
-        </p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Teams actively using Klyro to handle visitor questions every day.</p>
-      </div>
-      <div class="kly-reveal kly-reveal-delay-1 text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          <span class="kly-counter" data-counter="98">98</span><span class="text-violet-500">%</span>
-        </p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Answer accuracy on content the model was trained on. No guessing.</p>
-      </div>
-      <div class="kly-reveal kly-reveal-delay-2 text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          &lt;<span class="kly-counter" data-counter="3">3</span><span class="text-slate-400">s</span>
-        </p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">Average first response time — faster than any human support agent.</p>
-      </div>
-      <div class="kly-reveal kly-reveal-delay-3 text-center sm:text-left">
-        <p class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          <span class="text-fuchsia-500">$0</span>
-        </p>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">To get started. Free plan. No credit card. No expiry date.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════ FEATURES ════════════════════════════════ -->
+<!-- ═══════════════════════════ BENTO FEATURES ════════════════════════════ -->
 <section id="features" class="px-4 py-24 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-7xl">
-    <div class="kly-reveal mx-auto max-w-2xl text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Everything your visitors expect —<br class="hidden sm:block"> nothing you have to build</h2>
-      <p class="mt-4 text-lg text-slate-500">Built to convert questions into answers, answers into leads, and leads into revenue.</p>
+    <div class="kly-section-head mx-auto max-w-2xl text-center mb-16">
+      <p class="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium" style="border-color:rgba(6,182,212,0.20);color:#22d3ee;background:rgba(6,182,212,0.06)">Features</p>
+      <h2 class="text-4xl font-black tracking-tight sm:text-5xl" style="color:#f8fafc">Everything your visitors expect —<br class="hidden sm:block"/> nothing you have to build</h2>
     </div>
-    <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {% set feats = [
-        ('Train on your content', 'Ingest pages and docs so every reply cites what you actually ship. No hallucinations — ever.', '🧠'),
-        ('Instant install', 'One embed tag. Styled to feel native on your site or app. Works everywhere HTML runs.', '⚡'),
-        ('Lead capture', 'Collect names and emails when visitors want a human. CRM-ready export built in.', '📬'),
-        ('Insight-ready', 'See what people ask — so product and marketing stay perfectly aligned.', '📊')
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(200px,auto)]">
+
+      <div class="kly-bento md:col-span-2 md:row-span-2 p-8 flex flex-col justify-between">
+        <div>
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl mb-4" style="background:rgba(6,182,212,0.12);color:#22d3ee">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:#f8fafc">RAG-powered knowledge base</h3>
+          <p class="text-sm leading-relaxed" style="color:#64748b">Crawls your entire site, chunks content intelligently, embeds with OpenAI — then retrieves exactly the right context for each question. No hallucinations.</p>
+        </div>
+        <div class="mt-6 space-y-2">
+          <div class="flex items-center gap-3 text-xs" style="color:#475569">
+            <span class="w-16 text-right">Accuracy</span>
+            <div class="kly-progress flex-1"><div class="kly-progress-fill" style="width:94%"></div></div>
+            <span class="w-8">94%</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs" style="color:#475569">
+            <span class="w-16 text-right">Speed</span>
+            <div class="kly-progress flex-1"><div class="kly-progress-fill" style="width:82%;background:linear-gradient(90deg,#8b5cf6,#ec4899)"></div></div>
+            <span class="w-8">82ms</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kly-bento p-6 flex flex-col gap-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl" style="background:rgba(139,92,246,0.12);color:#a78bfa">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7a15 15 0 00-2.699-2.7"/></svg>
+        </div>
+        <h3 class="font-semibold" style="color:#f8fafc">One-line install</h3>
+        <p class="text-sm" style="color:#475569">Paste one <code class="kly-code inline px-1.5 py-0.5 text-[11px]">&lt;script&gt;</code> tag. Done. Works on any website, CMS, or framework.</p>
+      </div>
+
+      <div class="kly-bento p-6 flex flex-col gap-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl" style="background:rgba(16,185,129,0.12);color:#34d399">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+        </div>
+        <h3 class="font-semibold" style="color:#f8fafc">Analytics &amp; insights</h3>
+        <p class="text-sm" style="color:#475569">See every question visitors ask. Identify gaps in your content automatically.</p>
+      </div>
+
+      <div class="kly-bento md:col-span-2 p-6 flex flex-col sm:flex-row items-start gap-6">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl shrink-0" style="background:rgba(59,130,246,0.12);color:#60a5fa">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-semibold mb-2" style="color:#f8fafc">Lead capture, built in</h3>
+          <p class="text-sm mb-4" style="color:#475569">When AI detects purchase intent, it shows a lead form. Names and emails land in your dashboard — and your inbox — instantly.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="rounded-full px-3 py-1 text-xs font-medium" style="background:rgba(6,182,212,0.10);color:#22d3ee">Intent detection</span>
+            <span class="rounded-full px-3 py-1 text-xs font-medium" style="background:rgba(139,92,246,0.10);color:#a78bfa">Email notifications</span>
+            <span class="rounded-full px-3 py-1 text-xs font-medium" style="background:rgba(16,185,129,0.10);color:#34d399">CSV export</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ STATS ════════════════════════════════════ -->
+<section class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style="background:rgba(6,13,26,0.6)">
+  <div class="absolute inset-x-0 top-0 h-px" style="background:linear-gradient(90deg,transparent,rgba(6,182,212,0.4),rgba(139,92,246,0.4),transparent)"></div>
+
+  <div class="mx-auto max-w-7xl grid grid-cols-2 gap-8 md:grid-cols-4">
+    <div class="text-center kly-reveal">
+      <p class="text-4xl font-black kly-text-gradient-blue"><span class="kly-counter" data-counter="500">500</span>+</p>
+      <p class="mt-2 text-sm" style="color:#475569">Teams worldwide</p>
+    </div>
+    <div class="text-center kly-reveal kly-reveal-delay-1">
+      <p class="text-4xl font-black" style="color:#f8fafc"><span class="kly-counter" data-counter="2">2</span>M+</p>
+      <p class="mt-2 text-sm" style="color:#475569">Conversations answered</p>
+    </div>
+    <div class="text-center kly-reveal kly-reveal-delay-2">
+      <p class="text-4xl font-black cs-text-gradient"><span class="kly-counter" data-counter="4">4</span>.9/5</p>
+      <p class="mt-2 text-sm" style="color:#475569">Average rating</p>
+    </div>
+    <div class="text-center kly-reveal kly-reveal-delay-3">
+      <p class="text-4xl font-black" style="color:#f8fafc">&lt;<span class="kly-counter" data-counter="10">10</span>m</p>
+      <p class="mt-2 text-sm" style="color:#475569">Time to go live</p>
+    </div>
+  </div>
+
+  <div class="absolute inset-x-0 bottom-0 h-px" style="background:linear-gradient(90deg,transparent,rgba(139,92,246,0.3),transparent)"></div>
+</section>
+
+<!-- ═══════════════════════ HOW IT WORKS ════════════════════════════════ -->
+<section id="how" class="px-4 py-24 sm:px-6 lg:px-8 relative overflow-hidden">
+  <div class="mx-auto max-w-7xl">
+    <div class="kly-section-head kly-reveal mx-auto max-w-2xl text-center mb-16">
+      <p class="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium" style="border-color:rgba(139,92,246,0.20);color:#a78bfa;background:rgba(139,92,246,0.06)">How it works</p>
+      <h2 class="text-4xl font-black tracking-tight sm:text-5xl" style="color:#f8fafc">Up and running in 3 steps</h2>
+      <p class="mt-4 text-lg" style="color:#64748b">No ML PhD. No engineering sprint. Just paste a URL, train, and embed.</p>
+    </div>
+
+    <div class="relative">
+      <div class="pointer-events-none absolute left-[16.6%] right-[16.6%] top-8 hidden h-px md:block" style="background:linear-gradient(90deg,transparent,rgba(6,182,212,0.3),rgba(139,92,246,0.3),transparent)"></div>
+
+      <div class="grid gap-10 md:grid-cols-3">
+        <div class="kly-reveal kly-reveal-delay-0 relative text-center">
+          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+            <div class="absolute inset-0 rounded-full" style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.25);box-shadow:0 0 28px rgba(6,182,212,0.15)"></div>
+            <span class="relative text-2xl font-bold" style="color:#22d3ee">1</span>
+          </div>
+          <p class="inline-block rounded-full px-3 py-0.5 text-xs font-medium" style="background:rgba(6,182,212,0.10);color:#22d3ee;border:1px solid rgba(6,182,212,0.20)">Under 30 seconds</p>
+          <h3 class="mt-4 text-lg font-semibold" style="color:#f8fafc">Add your site</h3>
+          <p class="mt-2 text-sm leading-relaxed" style="color:#64748b">Paste a URL. We crawl, chunk, and index your public pages automatically.</p>
+        </div>
+
+        <div class="kly-reveal kly-reveal-delay-1 relative text-center">
+          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+            <div class="absolute inset-0 rounded-full" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);box-shadow:0 0 28px rgba(139,92,246,0.15)"></div>
+            <span class="relative text-2xl font-bold" style="color:#a78bfa">2</span>
+          </div>
+          <p class="inline-block rounded-full px-3 py-0.5 text-xs font-medium" style="background:rgba(139,92,246,0.10);color:#a78bfa;border:1px solid rgba(139,92,246,0.20)">Fully automatic</p>
+          <h3 class="mt-4 text-lg font-semibold" style="color:#f8fafc">Train &amp; tune</h3>
+          <p class="mt-2 text-sm leading-relaxed" style="color:#64748b">Embeddings + semantic retrieval keep answers accurate and grounded in your voice.</p>
+        </div>
+
+        <div class="kly-reveal kly-reveal-delay-2 text-center">
+          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+            <div class="absolute inset-0 rounded-full" style="background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.25);box-shadow:0 0 28px rgba(236,72,153,0.12)"></div>
+            <span class="relative text-2xl font-bold" style="color:#f472b6">3</span>
+          </div>
+          <p class="inline-block rounded-full px-3 py-0.5 text-xs font-medium" style="background:rgba(236,72,153,0.10);color:#f472b6;border:1px solid rgba(236,72,153,0.20)">Paste once</p>
+          <h3 class="mt-4 text-lg font-semibold" style="color:#f8fafc">Go live</h3>
+          <p class="mt-2 text-sm leading-relaxed" style="color:#64748b">Paste the snippet. Your assistant appears site-wide, branded to match your design.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ TESTIMONIALS ═══════════════════════════════ -->
+<section class="py-20 overflow-hidden" style="background:rgba(6,13,26,0.4);border-top:1px solid rgba(148,163,184,0.06);border-bottom:1px solid rgba(148,163,184,0.06)">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="kly-section-head kly-reveal mb-12 text-center">
+      <h2 class="text-3xl font-black tracking-tight sm:text-4xl" style="color:#f8fafc">Teams love Klyro</h2>
+      <p class="mt-3" style="color:#64748b">Real results from real customers</p>
+    </div>
+    <div class="flex gap-4 overflow-x-auto pb-4 kly-chat-scroll snap-x snap-mandatory">
+      {% for quote, name, role in [
+        ('We cut support tickets by 40% in the first month. Visitors get answers instantly.', 'Alex Chen', 'Head of Support, SaaS startup'),
+        ('Setup took 8 minutes. Our docs site was live with a trained assistant before lunch.', 'Jordan Lee', 'Founder, DevTools co'),
+        ('Lead capture inside chat is a game-changer — 47 qualified emails in week one.', 'Maria Santos', 'Marketing Director'),
+        ('Finally an AI widget that doesn\'t hallucinate. It only cites our actual docs.', 'Ryan Park', 'Product Lead')
       ] %}
-      {% for title, desc, icon in feats %}
-      <div class="tilt-card kly-reveal kly-reveal-delay-{{ loop.index0 }} group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-indigo-200 hover:shadow-md" data-tilt>
-        <div class="tilt-card-inner">
-          <div class="text-3xl">{{ icon }}</div>
-          <h3 class="mt-4 text-lg font-semibold text-slate-900">{{ title }}</h3>
-          <p class="mt-2 text-sm leading-relaxed text-slate-500">{{ desc }}</p>
+      <div class="kly-bento kly-reveal shrink-0 w-[min(340px,85vw)] snap-start p-6 flex flex-col gap-4">
+        <p class="text-sm leading-relaxed" style="color:#cbd5e1">"{{ quote }}"</p>
+        <div class="mt-auto flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6)">{{ name[0] }}</div>
+          <div>
+            <p class="text-sm font-semibold" style="color:#f8fafc">{{ name }}</p>
+            <p class="text-xs" style="color:#475569">{{ role }}</p>
+          </div>
         </div>
       </div>
       {% endfor %}
@@ -185,110 +293,55 @@
   </div>
 </section>
 
-<!-- ═══════════════════════ HOW IT WORKS ════════════════════════════════ -->
-<section id="how" class="border-t border-slate-200 bg-slate-50 px-4 py-24 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-7xl">
-    <div class="kly-reveal text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Up and running in 3 steps</h2>
-      <p class="mx-auto mt-3 max-w-lg text-slate-500">No ML PhD. No engineering sprint. Just paste a URL, train, and embed.</p>
-    </div>
-    <!-- connector line (desktop only) -->
-    <div class="relative mt-16">
-      <div class="pointer-events-none absolute left-[16.6%] right-[16.6%] top-8 hidden h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:block"></div>
-
-      <div class="grid gap-10 md:grid-cols-3">
-
-        <div class="kly-reveal kly-reveal-delay-0 relative text-center">
-          <!-- step circle -->
-          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
-            <div class="absolute inset-0 rounded-full border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white shadow-[0_0_28px_rgba(99,102,241,0.18)]"></div>
-            <span class="relative text-2xl font-bold text-indigo-600">1</span>
-          </div>
-          <p class="inline-block rounded-full border border-indigo-200 bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-700">Under 30 seconds</p>
-          <h3 class="mt-4 text-lg font-semibold text-slate-900">Add your site</h3>
-          <p class="mt-2 text-sm leading-relaxed text-slate-500">Paste a URL. We crawl, chunk, and index your public pages automatically.</p>
-        </div>
-
-        <div class="kly-reveal kly-reveal-delay-1 relative text-center">
-          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
-            <div class="absolute inset-0 rounded-full border border-violet-200 bg-gradient-to-br from-violet-50 to-white shadow-[0_0_28px_rgba(139,92,246,0.18)]"></div>
-            <span class="relative text-2xl font-bold text-violet-600">2</span>
-          </div>
-          <p class="inline-block rounded-full border border-violet-200 bg-violet-50 px-3 py-0.5 text-xs font-medium text-violet-700">Fully automatic</p>
-          <h3 class="mt-4 text-lg font-semibold text-slate-900">Train & tune</h3>
-          <p class="mt-2 text-sm leading-relaxed text-slate-500">Embeddings + semantic retrieval keep answers accurate and grounded in your voice.</p>
-        </div>
-
-        <div class="kly-reveal kly-reveal-delay-2 text-center">
-          <div class="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
-            <div class="absolute inset-0 rounded-full border border-fuchsia-200 bg-gradient-to-br from-fuchsia-50 to-white shadow-[0_0_28px_rgba(217,70,239,0.15)]"></div>
-            <span class="relative text-2xl font-bold text-fuchsia-600">3</span>
-          </div>
-          <p class="inline-block rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 py-0.5 text-xs font-medium text-fuchsia-700">Paste once</p>
-          <h3 class="mt-4 text-lg font-semibold text-slate-900">Go live</h3>
-          <p class="mt-2 text-sm leading-relaxed text-slate-500">Paste the snippet. Your assistant appears site-wide, branded to match your design.</p>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ══════════════════ FEATURE SHOWCASE (scroll-flip cards) ══════════════ -->
-<section id="features-deep" class="border-t border-slate-200 px-4 py-24 sm:px-6 lg:px-8">
+<section id="features-deep" class="px-4 py-24 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-6xl">
-
-    <div class="kly-reveal mb-16 text-center">
-      <p class="mb-3 text-sm font-medium uppercase tracking-widest text-indigo-600">Everything you need</p>
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">See Klyro in action</h2>
-      <p class="mt-4 text-lg text-slate-500">Four powerful capabilities. One lightweight embed.</p>
+    <div class="kly-section-head kly-reveal mb-16 text-center">
+      <p class="mb-3 text-sm font-medium uppercase tracking-widest" style="color:#22d3ee">Everything you need</p>
+      <h2 class="text-3xl font-black tracking-tight sm:text-4xl" style="color:#f8fafc">See Klyro in action</h2>
+      <p class="mt-4 text-lg" style="color:#64748b">Four powerful capabilities. One lightweight embed.</p>
     </div>
 
     <div class="space-y-10">
 
-      <!-- ── Feature 1: Train ── -->
-      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
-        <!-- text -->
+      <div class="kly-flip-card kly-bento overflow-hidden lg:grid lg:min-h-[420px] lg:grid-cols-2">
         <div class="flex flex-col justify-center p-8 lg:p-12">
-          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700">
-            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-600">01</span>
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold" style="background:rgba(6,182,212,0.10);color:#22d3ee;border:1px solid rgba(6,182,212,0.20)">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style="background:rgba(6,182,212,0.20)">01</span>
             Instant training
           </div>
-          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Train on your entire website in minutes</h3>
-          <p class="mt-4 leading-relaxed text-slate-500">Paste any URL. Klyro crawls every linked page, extracts content, and builds a semantic retrieval index — automatically. No uploads, no tagging, no maintenance.</p>
+          <h3 class="text-2xl font-bold leading-snug sm:text-3xl" style="color:#f8fafc">Train on your entire website in minutes</h3>
+          <p class="mt-4 leading-relaxed" style="color:#64748b">Paste any URL. Klyro crawls every linked page, extracts content, and builds a semantic retrieval index — automatically. No uploads, no tagging, no maintenance.</p>
           <ul class="mt-6 space-y-2.5">
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-[10px]">✓</span> Multi-page crawl support</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-[10px]">✓</span> PDF &amp; doc ingestion</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-[10px]">✓</span> Auto re-trains when content updates</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(6,182,212,0.15);color:#22d3ee">✓</span> Multi-page crawl support</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(6,182,212,0.15);color:#22d3ee">✓</span> PDF &amp; doc ingestion</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(6,182,212,0.15);color:#22d3ee">✓</span> Auto re-trains when content updates</li>
           </ul>
         </div>
-        <!-- visual mockup — intentionally dark, looks like real app screenshot -->
-        <div class="flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 p-8 lg:p-10">
+        <div class="flex items-center justify-center p-8 lg:p-10" style="background:linear-gradient(135deg,rgba(6,13,26,0.9),rgba(3,7,18,0.95))">
           <div class="w-full max-w-sm">
-            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
-              <div class="flex items-center gap-2 border-b border-white/[0.06] bg-slate-900 px-4 py-3">
+            <div class="overflow-hidden rounded-2xl border shadow-2xl" style="border-color:rgba(148,163,184,0.10);background:#030712">
+              <div class="flex items-center gap-2 border-b px-4 py-3" style="border-color:rgba(148,163,184,0.08);background:#0a1628">
                 <div class="flex gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-red-500/80"></span><span class="h-2.5 w-2.5 rounded-full bg-amber-400/80"></span><span class="h-2.5 w-2.5 rounded-full bg-emerald-500/70"></span></div>
-                <span class="ml-2 text-xs text-slate-500">Klyro — Training</span>
+                <span class="ml-2 text-xs" style="color:#475569">Klyro — Training</span>
               </div>
               <div class="p-5">
-                <p class="mb-1.5 text-[11px] font-medium text-slate-500">Website URL</p>
-                <div class="mb-4 flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-slate-900 px-3 py-2.5 text-sm text-slate-300">
-                  <svg class="h-3.5 w-3.5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                <p class="mb-1.5 text-[11px] font-medium" style="color:#475569">Website URL</p>
+                <div class="mb-4 flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm" style="border-color:rgba(6,182,212,0.25);background:rgba(6,13,26,0.8);color:#94a3b8">
+                  <svg class="h-3.5 w-3.5 shrink-0" style="color:#22d3ee" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                   docs.acme.com
                 </div>
                 <div class="mb-4">
                   <div class="mb-1.5 flex items-center justify-between text-xs">
-                    <span class="font-medium text-indigo-400">Crawling pages…</span>
-                    <span class="text-slate-500">43 / 58</span>
+                    <span class="font-medium" style="color:#22d3ee">Crawling pages…</span>
+                    <span style="color:#475569">43 / 58</span>
                   </div>
-                  <div class="h-1.5 overflow-hidden rounded-full bg-slate-800">
-                    <div class="kly-progress-bar h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" style="width:74%"></div>
-                  </div>
+                  <div class="kly-progress"><div class="kly-progress-fill" style="width:74%"></div></div>
                 </div>
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-2 text-xs text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span>pricing.acme.com — indexed</div>
-                  <div class="flex items-center gap-2 text-xs text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-indigo-400"></span>docs.acme.com/api — indexed</div>
-                  <div class="flex animate-pulse items-center gap-2 text-xs text-slate-500"><span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>docs.acme.com/faq — processing…</div>
+                <div class="space-y-1.5 text-xs" style="color:#64748b">
+                  <div class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>pricing.acme.com — indexed</div>
+                  <div class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-cyan-400"></span>docs.acme.com/api — indexed</div>
+                  <div class="flex animate-pulse items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>docs.acme.com/faq — processing…</div>
                 </div>
               </div>
             </div>
@@ -296,85 +349,76 @@
         </div>
       </div>
 
-      <!-- ── Feature 2: Accurate answers ── -->
-      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
-        <!-- visual first on desktop (reversed) — stays dark -->
-        <div class="order-last flex items-center justify-center bg-gradient-to-bl from-slate-800 via-slate-900 to-slate-950 p-8 lg:order-first lg:p-10">
+      <div class="kly-flip-card kly-bento overflow-hidden lg:grid lg:min-h-[420px] lg:grid-cols-2">
+        <div class="order-last flex items-center justify-center p-8 lg:order-first lg:p-10" style="background:linear-gradient(225deg,rgba(6,13,26,0.9),rgba(3,7,18,0.95))">
           <div class="w-full max-w-sm">
-            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
-              <div class="flex items-center gap-3 border-b border-white/[0.06] bg-slate-900/80 px-4 py-3">
-                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white">K</div>
-                <div><p class="text-xs font-semibold text-white">Klyro Assistant</p><p class="text-[10px] text-indigo-400">● Online · Trained on your site</p></div>
+            <div class="overflow-hidden rounded-2xl border shadow-2xl" style="border-color:rgba(148,163,184,0.10);background:#030712">
+              <div class="flex items-center gap-3 border-b px-4 py-3" style="border-color:rgba(148,163,184,0.08);background:#0a1628">
+                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6)">K</div>
+                <div><p class="text-xs font-semibold" style="color:#f8fafc">Klyro Assistant</p><p class="text-[10px]" style="color:#22d3ee">● Online · Trained on your site</p></div>
               </div>
               <div class="space-y-3 p-4">
                 <div class="flex justify-end">
-                  <div class="max-w-[80%] rounded-2xl rounded-tr-sm bg-slate-700/60 px-3.5 py-2.5 text-xs text-slate-200">What's your refund policy?</div>
+                  <div class="max-w-[80%] rounded-2xl rounded-tr-sm px-3.5 py-2.5 text-xs text-white" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6)">What's your refund policy?</div>
                 </div>
                 <div class="flex items-start gap-2">
-                  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-[9px] font-bold text-white">K</div>
-                  <div class="max-w-[80%] space-y-2 rounded-2xl rounded-tl-sm bg-slate-800/80 px-3.5 py-2.5 text-xs text-slate-300">
-                    <p>We offer a <span class="font-semibold text-indigo-400">14-day full refund</span> on all plans — no questions asked.</p>
-                    <div class="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-slate-900/70 px-2.5 py-1.5 text-[10px] text-slate-500">
-                      <svg class="h-3 w-3 shrink-0 text-indigo-500/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656"/></svg>
+                  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6)">K</div>
+                  <div class="max-w-[80%] space-y-2 rounded-2xl rounded-tl-sm border px-3.5 py-2.5 text-xs" style="border-color:rgba(148,163,184,0.10);background:rgba(10,22,40,0.9);color:#cbd5e1">
+                    <p>We offer a <span class="font-semibold" style="color:#22d3ee">14-day full refund</span> on all plans — no questions asked.</p>
+                    <div class="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[10px]" style="border-color:rgba(148,163,184,0.08);background:rgba(3,7,18,0.8);color:#475569">
+                      <svg class="h-3 w-3 shrink-0" style="color:#06b6d4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656"/></svg>
                       Source: acme.com/refunds
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="border-t border-white/[0.05] bg-slate-900/50 px-4 py-2.5">
-                <div class="rounded-xl border border-white/[0.06] bg-slate-950/50 px-3 py-2 text-xs text-slate-600">Ask anything about this site…</div>
-              </div>
             </div>
           </div>
         </div>
-        <!-- text -->
         <div class="flex flex-col justify-center p-8 lg:p-12">
-          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3.5 py-1.5 text-xs font-semibold text-sky-700">
-            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-100 text-[10px] font-bold text-sky-600">02</span>
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold" style="background:rgba(59,130,246,0.10);color:#60a5fa;border:1px solid rgba(59,130,246,0.20)">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style="background:rgba(59,130,246,0.20)">02</span>
             Accurate answers
           </div>
-          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Zero hallucinations. Grounded in your content.</h3>
-          <p class="mt-4 leading-relaxed text-slate-500">Every response is retrieved from your indexed content — not the model's imagination. If the answer isn't in your docs, Klyro says so and routes the visitor to you.</p>
+          <h3 class="text-2xl font-bold leading-snug sm:text-3xl" style="color:#f8fafc">Zero hallucinations. Grounded in your content.</h3>
+          <p class="mt-4 leading-relaxed" style="color:#64748b">Every response is retrieved from your indexed content — not the model's imagination. If the answer isn't in your docs, Klyro says so and routes the visitor to you.</p>
           <ul class="mt-6 space-y-2.5">
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 text-[10px]">✓</span> RAG-powered semantic retrieval</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 text-[10px]">✓</span> Source citations in every reply</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-600 text-[10px]">✓</span> Graceful fallback to human</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(59,130,246,0.15);color:#60a5fa">✓</span> RAG-powered semantic retrieval</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(59,130,246,0.15);color:#60a5fa">✓</span> Source citations in every reply</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(59,130,246,0.15);color:#60a5fa">✓</span> Graceful fallback to human</li>
           </ul>
         </div>
       </div>
 
-      <!-- ── Feature 3: Lead capture ── -->
-      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
-        <!-- text -->
+      <div class="kly-flip-card kly-bento overflow-hidden lg:grid lg:min-h-[420px] lg:grid-cols-2">
         <div class="flex flex-col justify-center p-8 lg:p-12">
-          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3.5 py-1.5 text-xs font-semibold text-violet-700">
-            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-violet-100 text-[10px] font-bold text-violet-600">03</span>
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold" style="background:rgba(139,92,246,0.10);color:#a78bfa;border:1px solid rgba(139,92,246,0.20)">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style="background:rgba(139,92,246,0.20)">03</span>
             Lead capture
           </div>
-          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Turn curious visitors into qualified leads — automatically.</h3>
-          <p class="mt-4 leading-relaxed text-slate-500">When a visitor asks something outside your docs or wants a human, Klyro captures their name and email inline — no popup, no separate form, zero friction.</p>
+          <h3 class="text-2xl font-bold leading-snug sm:text-3xl" style="color:#f8fafc">Turn curious visitors into qualified leads — automatically.</h3>
+          <p class="mt-4 leading-relaxed" style="color:#64748b">When a visitor asks something outside your docs or wants a human, Klyro captures their name and email inline — no popup, no separate form, zero friction.</p>
           <ul class="mt-6 space-y-2.5">
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 text-[10px]">✓</span> In-chat lead form</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 text-[10px]">✓</span> CSV &amp; CRM-ready export</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 text-[10px]">✓</span> Triggered by real intent signals</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(139,92,246,0.15);color:#a78bfa">✓</span> In-chat lead form</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(139,92,246,0.15);color:#a78bfa">✓</span> CSV &amp; CRM-ready export</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(139,92,246,0.15);color:#a78bfa">✓</span> Triggered by real intent signals</li>
           </ul>
         </div>
-        <!-- visual — stays dark (product mockup) -->
-        <div class="flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 p-8 lg:p-10">
+        <div class="flex items-center justify-center p-8 lg:p-10" style="background:linear-gradient(135deg,rgba(6,13,26,0.9),rgba(3,7,18,0.95))">
           <div class="w-full max-w-sm">
-            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
-              <div class="flex items-center gap-3 border-b border-white/[0.06] bg-slate-900/80 px-4 py-3">
-                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-xs font-bold text-white">K</div>
-                <div><p class="text-xs font-semibold text-white">Klyro Assistant</p><p class="text-[10px] text-violet-400">● Online</p></div>
+            <div class="overflow-hidden rounded-2xl border shadow-2xl" style="border-color:rgba(148,163,184,0.10);background:#030712">
+              <div class="flex items-center gap-3 border-b px-4 py-3" style="border-color:rgba(148,163,184,0.08);background:#0a1628">
+                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">K</div>
+                <div><p class="text-xs font-semibold" style="color:#f8fafc">Klyro Assistant</p><p class="text-[10px]" style="color:#a78bfa">● Online</p></div>
               </div>
               <div class="space-y-3 p-4">
                 <div class="flex items-start gap-2">
-                  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-[9px] font-bold text-white">K</div>
-                  <div class="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-800/80 px-3.5 py-2.5 text-xs text-slate-300">I'd love to connect you with our team! Drop your email and we'll follow up within the hour.</div>
+                  <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">K</div>
+                  <div class="max-w-[85%] rounded-2xl rounded-tl-sm border px-3.5 py-2.5 text-xs" style="border-color:rgba(148,163,184,0.10);background:rgba(10,22,40,0.9);color:#cbd5e1">I'd love to connect you with our team! Drop your email and we'll follow up within the hour.</div>
                 </div>
-                <div class="ml-8 rounded-2xl border border-violet-500/20 bg-violet-950/30 p-3.5 space-y-2">
-                  <div class="rounded-lg border border-white/[0.08] bg-slate-900 px-3 py-2 text-xs text-slate-400">sarah@startup.io</div>
-                  <button class="w-full rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 py-2 text-xs font-semibold text-white">Send — get in touch →</button>
+                <div class="ml-8 rounded-2xl border p-3.5 space-y-2" style="border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.08)">
+                  <div class="rounded-lg border px-3 py-2 text-xs" style="border-color:rgba(148,163,184,0.10);background:rgba(3,7,18,0.8);color:#64748b">sarah@startup.io</div>
+                  <button class="w-full rounded-lg py-2 text-xs font-semibold text-white" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">Send — get in touch →</button>
                 </div>
               </div>
             </div>
@@ -382,62 +426,55 @@
         </div>
       </div>
 
-      <!-- ── Feature 4: Analytics ── -->
-      <div class="kly-flip-card overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:min-h-[420px] lg:grid-cols-2">
-        <!-- visual first (reversed) — stays dark (product mockup) -->
-        <div class="order-last flex items-center justify-center bg-gradient-to-bl from-slate-800 via-slate-900 to-slate-950 p-8 lg:order-first lg:p-10">
+      <div class="kly-flip-card kly-bento overflow-hidden lg:grid lg:min-h-[420px] lg:grid-cols-2">
+        <div class="order-last flex items-center justify-center p-8 lg:order-first lg:p-10" style="background:linear-gradient(225deg,rgba(6,13,26,0.9),rgba(3,7,18,0.95))">
           <div class="w-full max-w-sm">
-            <div class="overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950 shadow-2xl shadow-black/50">
-              <div class="flex items-center justify-between border-b border-white/[0.06] bg-slate-900 px-4 py-3">
-                <span class="text-xs font-semibold text-white">Analytics — Last 30 days</span>
-                <span class="text-[10px] text-slate-500">Klyro</span>
+            <div class="overflow-hidden rounded-2xl border shadow-2xl" style="border-color:rgba(148,163,184,0.10);background:#030712">
+              <div class="flex items-center justify-between border-b px-4 py-3" style="border-color:rgba(148,163,184,0.08);background:#0a1628">
+                <span class="text-xs font-semibold" style="color:#f8fafc">Analytics — Last 30 days</span>
+                <span class="text-[10px]" style="color:#475569">Klyro</span>
               </div>
               <div class="p-4">
                 <div class="mb-4 grid grid-cols-3 gap-2">
-                  <div class="rounded-xl border border-white/[0.05] bg-slate-900 p-2.5 text-center">
-                    <p class="text-base font-bold text-white">1.2k</p>
-                    <p class="mt-0.5 text-[9px] text-slate-500">Convos</p>
+                  <div class="kly-stat-card kly-stat-cyan p-2.5 text-center !rounded-xl !p-2.5">
+                    <p class="text-base font-bold" style="color:#f8fafc">1.2k</p>
+                    <p class="mt-0.5 text-[9px]" style="color:#475569">Convos</p>
                   </div>
-                  <div class="rounded-xl border border-white/[0.05] bg-slate-900 p-2.5 text-center">
-                    <p class="text-base font-bold text-sky-400">94%</p>
-                    <p class="mt-0.5 text-[9px] text-slate-500">Answered</p>
+                  <div class="kly-stat-card kly-stat-blue p-2.5 text-center !rounded-xl !p-2.5">
+                    <p class="text-base font-bold" style="color:#60a5fa">94%</p>
+                    <p class="mt-0.5 text-[9px]" style="color:#475569">Answered</p>
                   </div>
-                  <div class="rounded-xl border border-white/[0.05] bg-slate-900 p-2.5 text-center">
-                    <p class="text-base font-bold text-violet-400">47</p>
-                    <p class="mt-0.5 text-[9px] text-slate-500">Leads</p>
+                  <div class="kly-stat-card kly-stat-violet p-2.5 text-center !rounded-xl !p-2.5">
+                    <p class="text-base font-bold" style="color:#a78bfa">47</p>
+                    <p class="mt-0.5 text-[9px]" style="color:#475569">Leads</p>
                   </div>
                 </div>
-                <p class="mb-2 text-[10px] uppercase tracking-widest text-slate-600">Top questions</p>
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-2 text-xs">
-                    <div class="min-w-0 flex-1 truncate rounded-lg border border-white/[0.04] bg-slate-900 px-2.5 py-1.5 text-slate-300">How does billing work?</div>
-                    <span class="shrink-0 text-slate-500">127×</span>
+                <p class="mb-2 text-[10px] uppercase tracking-widest" style="color:#475569">Top questions</p>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex items-center gap-2">
+                    <div class="min-w-0 flex-1 truncate rounded-lg border px-2.5 py-1.5" style="border-color:rgba(148,163,184,0.08);background:rgba(6,13,26,0.8);color:#94a3b8">How does billing work?</div>
+                    <span style="color:#475569">127×</span>
                   </div>
-                  <div class="flex items-center gap-2 text-xs">
-                    <div class="min-w-0 flex-1 truncate rounded-lg border border-white/[0.04] bg-slate-900 px-2.5 py-1.5 text-slate-300">What's the refund policy?</div>
-                    <span class="shrink-0 text-slate-500">84×</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-xs">
-                    <div class="min-w-0 flex-1 truncate rounded-lg border border-white/[0.04] bg-slate-900 px-2.5 py-1.5 text-slate-300">Can I export my data?</div>
-                    <span class="shrink-0 text-slate-500">61×</span>
+                  <div class="flex items-center gap-2">
+                    <div class="min-w-0 flex-1 truncate rounded-lg border px-2.5 py-1.5" style="border-color:rgba(148,163,184,0.08);background:rgba(6,13,26,0.8);color:#94a3b8">What's the refund policy?</div>
+                    <span style="color:#475569">84×</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- text -->
         <div class="flex flex-col justify-center p-8 lg:p-12">
-          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-1.5 text-xs font-semibold text-amber-700">
-            <span class="flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-600">04</span>
+          <div class="mb-5 inline-flex w-fit items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold" style="background:rgba(245,158,11,0.10);color:#fbbf24;border:1px solid rgba(245,158,11,0.20)">
+            <span class="flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style="background:rgba(245,158,11,0.20)">04</span>
             Analytics
           </div>
-          <h3 class="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl">Know exactly what your visitors want to know.</h3>
-          <p class="mt-4 leading-relaxed text-slate-500">The Klyro dashboard surfaces your most-asked questions, unanswered queries, and lead conversion data — so product and content teams stay perfectly aligned.</p>
+          <h3 class="text-2xl font-bold leading-snug sm:text-3xl" style="color:#f8fafc">Know exactly what your visitors want to know.</h3>
+          <p class="mt-4 leading-relaxed" style="color:#64748b">The Klyro dashboard surfaces your most-asked questions, unanswered queries, and lead conversion data — so product and content teams stay perfectly aligned.</p>
           <ul class="mt-6 space-y-2.5">
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px]">✓</span> Top questions by volume</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px]">✓</span> Unanswered query log</li>
-            <li class="flex items-center gap-2.5 text-sm text-slate-700"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px]">✓</span> Conversion &amp; lead metrics</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(245,158,11,0.15);color:#fbbf24">✓</span> Top questions by volume</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(245,158,11,0.15);color:#fbbf24">✓</span> Unanswered query log</li>
+            <li class="flex items-center gap-2.5 text-sm" style="color:#94a3b8"><span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]" style="background:rgba(245,158,11,0.15);color:#fbbf24">✓</span> Conversion &amp; lead metrics</li>
           </ul>
         </div>
       </div>
@@ -447,11 +484,11 @@
 </section>
 
 <!-- ═══════════════════════════ INDUSTRIES ═══════════════════════════════ -->
-<section class="border-t border-slate-200 bg-slate-50 px-4 py-24 sm:px-6 lg:px-8">
+<section class="px-4 py-24 sm:px-6 lg:px-8" style="background:rgba(6,13,26,0.5);border-top:1px solid rgba(148,163,184,0.06)">
   <div class="mx-auto max-w-7xl">
-    <div class="kly-reveal mb-12 text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900">Where teams use Klyro</h2>
-      <p class="mt-3 text-slate-500">Any website. Any stack. One embed.</p>
+    <div class="kly-section-head kly-reveal mb-12 text-center">
+      <h2 class="text-3xl font-black tracking-tight" style="color:#f8fafc">Where teams use Klyro</h2>
+      <p class="mt-3" style="color:#64748b">Any website. Any stack. One embed.</p>
     </div>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {% for icon, label, sub in [
@@ -462,10 +499,12 @@
         ('🛍️', 'E-commerce',           'Product questions, sizing, shipping — instant answers'),
         ('⚖️', 'Professional Services', 'Legal, finance, healthcare — accurate info, fast')
       ] %}
-      <div class="kly-reveal rounded-2xl border border-slate-200 bg-white px-6 py-7 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
-        <div class="mb-3 text-2xl">{{ icon }}</div>
-        <p class="text-base font-semibold text-slate-900">{{ label }}</p>
-        <p class="mt-1 text-sm text-slate-500">{{ sub }}</p>
+      <div class="kly-bento kly-reveal tilt-card px-6 py-7" data-tilt>
+        <div class="tilt-card-inner">
+          <div class="mb-3 text-2xl">{{ icon }}</div>
+          <p class="text-base font-semibold" style="color:#f8fafc">{{ label }}</p>
+          <p class="mt-1 text-sm" style="color:#64748b">{{ sub }}</p>
+        </div>
       </div>
       {% endfor %}
     </div>
@@ -473,24 +512,57 @@
 </section>
 
 <!-- ═══════════════════════ PRICING PREVIEW ═════════════════════════════ -->
-<section class="border-t border-slate-200 px-4 py-24 sm:px-6 lg:px-8">
-  <div class="kly-reveal mx-auto max-w-3xl text-center">
-    <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Start free. Scale when you're ready.</h2>
-    <p class="mt-4 text-slate-500">No credit card required. Free plan never expires. Upgrade only when volume or custom branding matter.</p>
-    <div class="mt-10 flex flex-wrap justify-center gap-4">
-      <a href="/pricing" class="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-semibold text-slate-700 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">Compare plans →</a>
-      <a href="/signup" class="cs-btn-shine rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-8 py-4 font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-400 hover:to-violet-500">Build my first chatbot free</a>
+<section class="px-4 py-24 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-5xl">
+    <div class="kly-section-head kly-reveal mx-auto max-w-2xl text-center mb-12">
+      <h2 class="text-3xl font-black tracking-tight sm:text-4xl" style="color:#f8fafc">Start free. Scale when you're ready.</h2>
+      <p class="mt-4" style="color:#64748b">No credit card required. Free plan never expires. Upgrade only when volume or custom branding matter.</p>
     </div>
-    <p class="mt-5 text-sm text-slate-400">Free plan · 1 chatbot · No expiry · No card required</p>
+    <div class="grid gap-4 md:grid-cols-3">
+      <div class="kly-pricing-card kly-reveal">
+        <p class="text-sm font-medium" style="color:#64748b">Free</p>
+        <p class="mt-2 text-3xl font-black" style="color:#f8fafc">$0</p>
+        <p class="mt-1 text-sm" style="color:#475569">1 chatbot · 100 convos/mo</p>
+        <ul class="mt-6 space-y-2 text-sm" style="color:#94a3b8">
+          <li>✓ Website training</li>
+          <li>✓ Widget embed</li>
+          <li>✓ Basic analytics</li>
+        </ul>
+        <a href="/signup" class="kly-btn-ghost mt-8 w-full text-center">Get started</a>
+      </div>
+      <div class="kly-pricing-card featured kly-reveal kly-reveal-delay-1">
+        <p class="text-sm font-medium" style="color:#22d3ee">Pro · Most popular</p>
+        <p class="mt-2 text-3xl font-black" style="color:#f8fafc">$49<span class="text-lg font-normal" style="color:#64748b">/mo</span></p>
+        <p class="mt-1 text-sm" style="color:#475569">5 chatbots · 2,000 convos/mo</p>
+        <ul class="mt-6 space-y-2 text-sm" style="color:#94a3b8">
+          <li>✓ Custom branding</li>
+          <li>✓ Lead capture</li>
+          <li>✓ Priority support</li>
+        </ul>
+        <a href="/signup" class="kly-btn-primary kly-magnetic mt-8 w-full text-center">Start free trial</a>
+      </div>
+      <div class="kly-pricing-card kly-reveal kly-reveal-delay-2">
+        <p class="text-sm font-medium" style="color:#64748b">Business</p>
+        <p class="mt-2 text-3xl font-black" style="color:#f8fafc">$149<span class="text-lg font-normal" style="color:#64748b">/mo</span></p>
+        <p class="mt-1 text-sm" style="color:#475569">Unlimited · White-label</p>
+        <ul class="mt-6 space-y-2 text-sm" style="color:#94a3b8">
+          <li>✓ SSO &amp; teams</li>
+          <li>✓ API access</li>
+          <li>✓ Dedicated support</li>
+        </ul>
+        <a href="/pricing" class="kly-btn-ghost mt-8 w-full text-center">Compare plans</a>
+      </div>
+    </div>
+    <p class="kly-reveal mt-8 text-center text-sm" style="color:#334155">Free plan · No expiry · No card required</p>
   </div>
 </section>
 
 <!-- ═══════════════════════════ FAQ ══════════════════════════════════════ -->
-<section id="faq" class="border-t border-slate-200 bg-slate-50 px-4 py-24 sm:px-6 lg:px-8">
+<section id="faq" class="px-4 py-24 sm:px-6 lg:px-8" style="background:rgba(6,13,26,0.5);border-top:1px solid rgba(148,163,184,0.06)">
   <div class="mx-auto max-w-3xl">
-    <div class="kly-reveal mb-14 text-center">
-      <p class="mb-3 text-sm font-medium uppercase tracking-widest text-indigo-600">Got questions?</p>
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Frequently asked</h2>
+    <div class="kly-section-head kly-reveal mb-14 text-center">
+      <p class="mb-3 text-sm font-medium uppercase tracking-widest" style="color:#22d3ee">Got questions?</p>
+      <h2 class="text-3xl font-black tracking-tight sm:text-4xl" style="color:#f8fafc">Frequently asked</h2>
     </div>
 
     <div class="space-y-2.5">
@@ -526,65 +598,63 @@
       ] %}
 
       {% for question, answer in faqs %}
-      <div class="kly-faq-item kly-reveal overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="kly-faq-item kly-reveal overflow-hidden rounded-2xl border" style="border-color:rgba(148,163,184,0.10);background:rgba(6,13,26,0.6)">
         <button class="kly-faq-btn group flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
-          <span class="font-medium text-slate-900 transition-colors group-hover:text-indigo-600">{{ question }}</span>
-          <span class="kly-faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-400 transition-all group-hover:border-indigo-200 group-hover:text-indigo-600">
+          <span class="font-medium transition-colors" style="color:#f8fafc">{{ question }}</span>
+          <span class="kly-faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full border" style="border-color:rgba(148,163,184,0.15);background:rgba(10,22,40,0.8);color:#64748b">
             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
           </span>
         </button>
         <div class="kly-faq-answer">
-          <p class="px-6 pb-5 text-sm leading-relaxed text-slate-500">{{ answer }}</p>
+          <p class="px-6 pb-5 text-sm leading-relaxed" style="color:#64748b">{{ answer }}</p>
         </div>
       </div>
       {% endfor %}
-
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ FINAL CTA (intentionally dark for contrast) ══════════════ -->
-<section class="px-4 pb-28 sm:px-6 lg:px-8">
-  <div class="kly-reveal relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-indigo-600/30 bg-gradient-to-br from-indigo-900 via-violet-900 to-slate-900 p-12 text-center shadow-[0_32px_80px_-16px_rgba(99,102,241,0.35)] sm:p-16">
-    <div class="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-violet-400/20 blur-[80px]"></div>
-    <div class="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-fuchsia-400/15 blur-[70px]"></div>
-    <div class="relative">
-      <!-- badge -->
-      <div class="mb-6 flex justify-center">
-        <div class="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-400/10 px-4 py-1.5 text-sm text-indigo-300">
-          <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400"></span>
-          500+ teams are already live
-        </div>
-      </div>
-      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Your visitors are asking questions right now.<br class="hidden sm:block"> Are you answering them?</h2>
-      <p class="mx-auto mt-4 max-w-xl text-slate-300">Join teams that replaced generic chatbots with an assistant that actually knows the product — grounded in your content, live in minutes.</p>
-      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <a href="/signup" class="cs-btn-shine inline-flex items-center gap-2 rounded-2xl bg-white px-10 py-4 text-base font-bold text-slate-900 shadow-xl transition hover:bg-indigo-50">
-          Build my first chatbot free →
-        </a>
-        <a href="/pricing" class="rounded-2xl border border-white/20 bg-white/5 px-8 py-4 text-base font-medium text-white backdrop-blur-sm transition hover:bg-white/10">
-          Compare plans
-        </a>
-      </div>
-      <p class="mt-6 text-sm text-slate-400">No credit card · Free plan · Cancel anytime</p>
-      <div class="mt-4 flex items-center justify-center gap-1.5 text-sm">
-        <span class="kly-star">★★★★★</span>
-        <span class="text-slate-400">4.9/5 from 120+ reviews</span>
-      </div>
+<!-- ═══════════════════════════ FINAL CTA ══════════════════════════════════ -->
+<section class="relative overflow-hidden py-32 px-4">
+  <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(6,182,212,0.07) 0%,rgba(139,92,246,0.05) 40%,transparent 70%)"></div>
+  <div class="absolute inset-x-0 top-0 h-px" style="background:linear-gradient(90deg,transparent,rgba(6,182,212,0.3),transparent)"></div>
+
+  <div class="relative mx-auto max-w-4xl text-center">
+    <h2 class="text-5xl font-black tracking-tight sm:text-6xl">
+      <span style="color:#f8fafc">Your website should</span><br/>
+      <span class="cs-text-gradient">answer for itself</span>
+    </h2>
+    <p class="mt-6 max-w-xl mx-auto text-lg" style="color:#94a3b8">
+      Join 500+ teams who stopped losing visitors to unanswered questions.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <a href="/signup" class="kly-btn-primary kly-magnetic text-base px-10 py-4">
+        Build my first chatbot — free
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+      <a href="/pricing" class="kly-btn-ghost kly-magnetic text-base px-8 py-4">Compare plans</a>
     </div>
+    <p class="mt-5 text-sm" style="color:#334155">No credit card · Free plan · Cancel anytime</p>
   </div>
 </section>
 
 {% endblock %}
 {% block scripts %}
+<script src="/static/js/klyro-3d.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.CS && window.CS.initHeroLiveChat)  window.CS.initHeroLiveChat();
-    if (window.CS && window.CS.initTiltCards)     window.CS.initTiltCards();
-    if (window.CS && window.CS.initFaqAccordion)  window.CS.initFaqAccordion();
-    if (window.CS && window.CS.initScrollReveal)  window.CS.initScrollReveal();
-    if (window.CS && window.CS.initCounters)      window.CS.initCounters();
-    if (window.CS && window.CS.initFlipCards)     window.CS.initFlipCards();
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.KlyroThree) window.KlyroThree.init('kly-hero-canvas');
+  if (window.CS) {
+    if (window.CS.initHeroLiveChat)  window.CS.initHeroLiveChat();
+    if (window.CS.initTiltCards)     window.CS.initTiltCards();
+    if (window.CS.initFaqAccordion)  window.CS.initFaqAccordion();
+    if (window.CS.initScrollReveal)  window.CS.initScrollReveal();
+    if (window.CS.initCounters)      window.CS.initCounters();
+    if (window.CS.initFlipCards)     window.CS.initFlipCards();
+    if (window.CS.initHeroGsap)      window.CS.initHeroGsap();
+    if (window.CS.initGsapScroll)    window.CS.initGsapScroll();
+    if (window.CS.initMagnetic)      window.CS.initMagnetic();
+  }
+});
 </script>
 {% endblock %}
