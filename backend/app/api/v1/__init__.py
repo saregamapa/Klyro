@@ -4,6 +4,7 @@ from app.api.v1 import (
     analytics,
     auth,
     chat,
+    chat_proxy,
     chatbots,
     conversations,
     health,
@@ -21,6 +22,7 @@ router.include_router(users.router)
 router.include_router(analytics.router)
 router.include_router(chat.router)
 router.include_router(chatbots.router)
+router.include_router(chat_proxy.router)
 router.include_router(ingest.router)
 router.include_router(rag.router)
 router.include_router(conversations.router)

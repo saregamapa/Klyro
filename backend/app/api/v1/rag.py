@@ -12,6 +12,7 @@ from app.repositories import embedding_repo
 from app.schemas.rag import EmbedResponse, RetrieveHit, RetrieveRequest, RetrieveResponse
 from app.services.embedding_service import get_embedding_service
 from app.services.vector_store import get_vector_store
+from app.utils.openai_errors import user_facing_openai_error
 
 logger = logging.getLogger(__name__)
 
@@ -57,12 +58,12 @@ def embed_chatbot_chunks(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(e),
         ) from e
-    except Exception:
+    except Exception as e:
         logger.exception("Embedding failed chatbot_id=%s", chatbot_id)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Embedding provider request failed",
-        ) from None
+            detail=user_facing_openai_error(e),
+        ) from e
 
     if len(vectors) != len(chunks):
         raise HTTPException(
@@ -120,12 +121,12 @@ def retrieve_chatbot_chunks(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(e),
         ) from e
-    except Exception:
+    except Exception as e:
         logger.exception("Query embedding failed chatbot_id=%s", chatbot_id)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Embedding provider request failed",
-        ) from None
+            detail=user_facing_openai_error(e),
+        ) from e
 
     try:
         hits = store.search(chatbot_id, qvec, top_k=body.top_k, conn=db)

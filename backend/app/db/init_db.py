@@ -21,6 +21,9 @@ DDL_STATEMENTS = [
         user_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         website_url TEXT,
+        system_prompt TEXT DEFAULT '',
+        accent_color TEXT DEFAULT '#6366f1',
+        scraped_content TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     )
@@ -29,6 +32,7 @@ DDL_STATEMENTS = [
     CREATE TABLE IF NOT EXISTS conversations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chatbot_id INTEGER NOT NULL,
+        session_id TEXT DEFAULT '',
         user_message TEXT NOT NULL,
         bot_response TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -88,12 +92,27 @@ def init_db() -> None:
         for stmt in DDL_STATEMENTS:
             conn.execute(stmt)
 
-        # Migration: add created_at to leads if missing
-        try:
-            conn.execute("ALTER TABLE leads ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-        except Exception as migration_err:
-            # Column likely already exists or other issue; log and continue
-            logger.debug("Migration for leads.created_at skipped: %s", str(migration_err))
+        # Migrations for columns added after initial release
+        _column_migrations = [
+            ("leads", "created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+            ("chatbots", "system_prompt", "TEXT DEFAULT ''"),
+            ("chatbots", "accent_color", "TEXT DEFAULT '#6366f1'"),
+            ("chatbots", "scraped_content", "TEXT DEFAULT ''"),
+            ("conversations", "session_id", "TEXT DEFAULT ''"),
+            ("leads", "phone", "TEXT"),
+        ]
+        for table, column, typedef in _column_migrations:
+            try:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {typedef}")
+            except Exception as migration_err:
+                logger.debug(
+                    "Migration %s.%s skipped: %s", table, column, migration_err
+                )
+
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_conversations_session "
+            "ON conversations(chatbot_id, session_id)"
+        )
 
         conn.commit()
         logger.info("SQLite schema ensured (%s)", get_db_path())

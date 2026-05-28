@@ -10,6 +10,19 @@
     return d.innerHTML;
   }
 
+  function previewSessionId(chatbotId) {
+    var key = "klyro_preview_session_" + chatbotId;
+    var sid = sessionStorage.getItem(key);
+    if (!sid) {
+      sid =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : "preview-" + Date.now();
+      sessionStorage.setItem(key, sid);
+    }
+    return sid;
+  }
+
   window.CSWidgetPreview = {
     init: function (chatbotId) {
       var form = document.getElementById("preview-form");
@@ -17,6 +30,7 @@
       var messages = document.getElementById("preview-messages");
       if (!form || !input || !messages) return;
 
+      var sessionId = previewSessionId(chatbotId);
       var leadKey = "klyro_preview_lead_" + chatbotId;
 
       form.addEventListener("submit", async function (e) {
@@ -45,7 +59,11 @@
           var res = await fetch("/api/v1/widget/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chatbot_id: chatbotId, message: text }),
+            body: JSON.stringify({
+              chatbot_id: chatbotId,
+              message: text,
+              session_id: sessionId,
+            }),
             signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined,
           });
           var data = await res.json().catch(function () {

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, field_validator
 class WidgetChatRequest(BaseModel):
     chatbot_id: int = Field(..., ge=1)
     message: str = Field(..., min_length=1, max_length=2000)
+    session_id: Optional[str] = Field(None, max_length=128)
 
     @field_validator("message")
     @classmethod
@@ -26,6 +27,7 @@ class WidgetChatRequest(BaseModel):
 
 class WidgetChatResponse(BaseModel):
     reply: str
+    session_id: Optional[str] = None
     show_lead_form: bool = False
     lead_prompt: Optional[str] = Field(
         default=None,

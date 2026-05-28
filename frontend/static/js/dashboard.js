@@ -254,7 +254,12 @@
               var emErr = await embedRes.json().catch(function () {
                 return {};
               });
-              throw new Error(emErr.detail || "Embed failed — check OpenAI key");
+              var emDetail = emErr.detail;
+              throw new Error(
+                typeof emDetail === "string"
+                  ? emDetail
+                  : "Embed failed — check OPENAI_API_KEY and billing at platform.openai.com"
+              );
             }
             setBar(100, "Done!");
             if (window.CS && window.CS.toast) window.CS.toast("Chatbot trained successfully", "success");
@@ -289,6 +294,27 @@
       var h = authHeaders();
       if (!h) return;
 
+      var leadsCache = [];
+
+      function switchTab(name) {
+        document.querySelectorAll(".detail-tab").forEach(function (btn) {
+          var on = btn.getAttribute("data-tab") === name;
+          btn.classList.toggle("text-emerald-400", on);
+          btn.classList.toggle("text-slate-400", !on);
+        });
+        document.querySelectorAll(".detail-tab-panel").forEach(function (panel) {
+          panel.classList.add("hidden");
+        });
+        var panel = document.getElementById("tab-" + name);
+        if (panel) panel.classList.remove("hidden");
+      }
+
+      document.querySelectorAll(".detail-tab").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          switchTab(btn.getAttribute("data-tab"));
+        });
+      });
+
       fetch("/api/v1/chatbots/" + id, { headers: h })
         .then(function (r) {
           return r.json().then(function (d) {
@@ -305,20 +331,70 @@
           document.getElementById("detail-name").textContent = bot.name;
           document.getElementById("detail-url").textContent = bot.website_url || "No website URL set";
 
-          var origin = window.location.origin;
-          var snippet =
-            '<script src="' +
-            origin +
-            '/widget.js" data-bot-id="' +
-            id +
-            '"><\/script>';
-          document.getElementById("install-snippet").textContent = snippet;
+          var accent = bot.accent_color || "#6366f1";
+          var sName = document.getElementById("settings-name");
+          var sUrl = document.getElementById("settings-url");
+          var sAccent = document.getElementById("settings-accent");
+          var sPrompt = document.getElementById("settings-prompt");
+          if (sName) sName.value = bot.name || "";
+          if (sUrl) sUrl.value = bot.website_url || "";
+          if (sAccent) sAccent.value = accent;
+          if (sPrompt) sPrompt.value = bot.system_prompt || "";
 
-          document.getElementById("copy-snippet").onclick = function () {
-            navigator.clipboard.writeText(snippet).then(function () {
-              if (window.CS && window.CS.toast) window.CS.toast("Copied to clipboard", "success");
+          var settingsForm = document.getElementById("settings-form");
+          if (settingsForm) {
+            settingsForm.addEventListener("submit", function (ev) {
+              ev.preventDefault();
+              var patch = {
+                name: sName ? sName.value.trim() : bot.name,
+                website_url: sUrl && sUrl.value.trim() ? sUrl.value.trim() : null,
+                accent_color: sAccent ? sAccent.value : accent,
+                system_prompt: sPrompt ? sPrompt.value : "",
+              };
+              fetch("/api/v1/chatbots/" + id, {
+                method: "PATCH",
+                headers: h,
+                body: JSON.stringify(patch),
+              })
+                .then(function (res) {
+                  return res.json().then(function (d) {
+                    return { ok: res.ok, d: d };
+                  });
+                })
+                .then(function (r) {
+                  if (!r.ok) throw new Error(r.d.detail || "Save failed");
+                  if (window.CS && window.CS.toast) window.CS.toast("Settings saved", "success");
+                  document.getElementById("detail-name").textContent = r.d.name;
+                  document.getElementById("detail-url").textContent = r.d.website_url || "No website URL set";
+                  updateSnippet(r.d);
+                })
+                .catch(function (err) {
+                  if (window.CS && window.CS.toast) window.CS.toast(err.message, "error");
+                });
             });
-          };
+          }
+
+          function updateSnippet(b) {
+            var origin = window.location.origin;
+            var ac = (b && b.accent_color) || accent;
+            var snippet =
+              '<script src="' +
+              origin +
+              '/widget.js" data-bot-id="' +
+              id +
+              '" data-accent-color="' +
+              ac +
+              '"><\/script>';
+            var pre = document.getElementById("install-snippet");
+            if (pre) pre.textContent = snippet;
+            document.getElementById("copy-snippet").onclick = function () {
+              navigator.clipboard.writeText(snippet).then(function () {
+                if (window.CS && window.CS.toast) window.CS.toast("Copied to clipboard", "success");
+              });
+            };
+          }
+
+          updateSnippet(bot);
 
           var delBtn = document.getElementById("delete-chatbot-btn");
           if (delBtn) {
@@ -342,15 +418,53 @@
             };
           }
 
-          // Fetch conversations (paginated response)
-          fetch("/api/v1/chatbots/" + id + "/conversations", { headers: h })
+          fetch("/api/v1/chatbots/" + id + "/stats", { headers: h })
+            .then(function (r) {
+              if (!r.ok) throw new Error("stats");
+              return r.json();
+            })
+            .then(function (st) {
+              var ss = document.getElementById("stat-sessions");
+              var sm = document.getElementById("stat-messages");
+              var sl = document.getElementById("stat-leads");
+              if (ss) ss.textContent = String(st.total_conversations);
+              if (sm) sm.textContent = String(st.total_messages);
+              if (sl) sl.textContent = String(st.total_leads);
+              var la = document.getElementById("stats-last-activity");
+              if (la) {
+                la.textContent = st.last_activity
+                  ? "Last activity: " + st.last_activity
+                  : "No activity yet.";
+              }
+            })
+            .catch(function () {});
+
+          fetch("/api/v1/chatbots/" + id + "/conversations?limit=30", { headers: h })
             .then(function (r) { return r.json(); })
             .then(function (d) {
-              var el = document.getElementById("stat-conv");
-              if (el) {
-                var count = typeof d.total === "number" ? d.total : (Array.isArray(d) ? d.length : 0);
-                el.textContent = String(count);
+              var list = document.getElementById("conversations-list");
+              var empty = document.getElementById("conversations-empty");
+              var items = d.items || [];
+              if (!list) return;
+              list.innerHTML = "";
+              if (!items.length) {
+                if (empty) empty.classList.remove("hidden");
+                return;
               }
+              if (empty) empty.classList.add("hidden");
+              items.slice().reverse().forEach(function (c) {
+                var card = document.createElement("div");
+                card.className = "rounded-xl border border-slate-700/50 bg-slate-900/40 p-3";
+                var sid = c.session_id ? '<span class="text-xs text-slate-500">Session ' + escapeHtml(c.session_id.slice(0, 8)) + "…</span>" : "";
+                card.innerHTML =
+                  sid +
+                  '<p class="mt-1 font-medium text-emerald-400/90">Visitor</p><p class="text-slate-300">' +
+                  escapeHtml(c.user_message) +
+                  '</p><p class="mt-2 font-medium text-slate-400">Bot</p><p class="text-slate-400">' +
+                  escapeHtml(c.bot_response) +
+                  "</p>";
+                list.appendChild(card);
+              });
             })
             .catch(function () {});
 
@@ -398,6 +512,7 @@
               var leadsEmpty = document.getElementById("leads-empty");
               var statLeads = document.getElementById("stat-leads");
               var items = Array.isArray(d) ? d : (d.items || []);
+              leadsCache = items;
               var total = typeof d.total === "number" ? d.total : items.length;
               if (statLeads) statLeads.textContent = String(total);
               if (leadsBody) {
@@ -428,6 +543,36 @@
               var statLeads = document.getElementById("stat-leads");
               if (statLeads) statLeads.textContent = "—";
             });
+
+          var exportBtn = document.getElementById("export-leads-csv");
+          if (exportBtn) {
+            exportBtn.addEventListener("click", function () {
+              if (!leadsCache.length) {
+                if (window.CS && window.CS.toast) window.CS.toast("No leads to export", "info");
+                return;
+              }
+              var rows = [["name", "email", "message"]];
+              leadsCache.forEach(function (lead) {
+                rows.push([
+                  lead.name || "",
+                  lead.email || "",
+                  (lead.message || "").replace(/"/g, '""'),
+                ]);
+              });
+              var csv = rows
+                .map(function (row) {
+                  return row.map(function (c) {
+                    return '"' + String(c).replace(/"/g, '""') + '"';
+                  }).join(",");
+                })
+                .join("\n");
+              var blob = new Blob([csv], { type: "text/csv" });
+              var a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = "klyro-leads-" + id + ".csv";
+              a.click();
+            });
+          }
         })
         .catch(function (err) {
           console.error("Detail page error:", err);

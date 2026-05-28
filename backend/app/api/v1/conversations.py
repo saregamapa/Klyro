@@ -19,6 +19,7 @@ def _to_public(row: dict) -> ConversationPublic:
     return ConversationPublic(
         id=row["id"],
         chatbot_id=row["chatbot_id"],
+        session_id=str(row.get("session_id") or ""),
         user_message=row["user_message"],
         bot_response=row["bot_response"],
         created_at=str(row["created_at"]),

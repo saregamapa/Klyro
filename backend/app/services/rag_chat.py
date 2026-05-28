@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from openai import OpenAI
 
 from app.core.config import settings
-from app.repositories import conversation_repo, embedding_repo
+from app.repositories import chatbot_repo, conversation_repo, embedding_repo
 from app.services.embedding_service import get_embedding_service
 from app.services.lead_intent import should_prompt_lead_capture
 from app.services.vector_store import get_vector_store
@@ -38,17 +38,39 @@ _DEFAULT_LEAD_PROMPT = (
 )
 
 
-def _build_system_prompt(context_blocks: list[str]) -> str:
+def _build_system_prompt(
+    context_blocks: list[str],
+    chatbot: dict[str, object] | None,
+) -> str:
     if context_blocks:
         context = "\n\n---\n\n".join(context_blocks)
     else:
         context = "(No matching context was retrieved from the knowledge base.)"
-    return (
-        "You are a helpful assistant for a website chatbot. "
-        "Answer ONLY using the context below. "
-        "If the answer is not in the context, say you do not have enough information in the provided sources.\n\n"
-        f"Context:\n{context}"
-    )
+
+    website = ""
+    if chatbot:
+        website = str(chatbot.get("website_url") or chatbot.get("name") or "this website")
+
+    custom = ""
+    if chatbot:
+        custom = str(chatbot.get("system_prompt") or "").strip()
+
+    if custom:
+        base = custom
+    else:
+        base = (
+            f"You are a helpful assistant for {website}. "
+            "Answer using the context below when possible. "
+            "If the answer is not in the context, say you do not have enough information "
+            "in the provided sources."
+        )
+
+    parts = [base, f"Context:\n{context}"]
+    if chatbot:
+        scraped = str(chatbot.get("scraped_content") or "").strip()
+        if scraped:
+            parts.append(f"Website overview:\n{scraped[:2500]}")
+    return "\n\n".join(parts)
 
 
 def run_rag_chat(
@@ -56,6 +78,7 @@ def run_rag_chat(
     chatbot_id: int,
     user_message: str,
     *,
+    session_id: str | None = None,
     top_k: int | None = None,
 ) -> RagChatOutcome:
     """
@@ -63,6 +86,10 @@ def run_rag_chat(
     """
     if not settings.openai_api_key.strip():
         raise RuntimeError("OPENAI_API_KEY is not configured")
+
+    chatbot = chatbot_repo.get_chatbot_by_id(conn, chatbot_id)
+    if chatbot is None:
+        raise ValueError("Chatbot not found")
 
     k = top_k if top_k is not None else settings.rag_chat_top_k
     embedder = get_embedding_service()
@@ -90,16 +117,24 @@ def run_rag_chat(
         )
         context_blocks.append(f"[Source: {row['source_url']}]\n{row['content']}")
 
-    system_prompt = _build_system_prompt(context_blocks)
+    system_prompt = _build_system_prompt(context_blocks, chatbot)
+    history: list[dict[str, str]] = []
+    sid = (session_id or "").strip()
+    if sid:
+        history = conversation_repo.get_session_history(
+            conn, chatbot_id, sid, limit=10
+        )
+
+    messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
+
     client = OpenAI(api_key=settings.openai_api_key)
 
     try:
         completion = client.chat.completions.create(
             model=settings.openai_chat_model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
+            messages=messages,
             temperature=0.2,
         )
     except Exception:
@@ -107,7 +142,9 @@ def run_rag_chat(
         raise
 
     reply = (completion.choices[0].message.content or "").strip()
-    conv_id = conversation_repo.save_conversation(conn, chatbot_id, user_message, reply)
+    conv_id = conversation_repo.save_conversation(
+        conn, chatbot_id, user_message, reply, session_id=sid or None
+    )
     logger.info("RAG chat saved conversation_id=%s chatbot_id=%s", conv_id, chatbot_id)
     want_lead = should_prompt_lead_capture(user_message)
     return RagChatOutcome(

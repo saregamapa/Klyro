@@ -14,14 +14,17 @@ def save_conversation(
     chatbot_id: int,
     user_message: str,
     bot_response: str,
+    *,
+    session_id: str | None = None,
 ) -> int:
-    logger.debug("save_conversation chatbot_id=%s", chatbot_id)
+    logger.debug("save_conversation chatbot_id=%s session_id=%s", chatbot_id, session_id)
+    sid = (session_id or "").strip()
     cur = conn.execute(
         """
-        INSERT INTO conversations (chatbot_id, user_message, bot_response)
-        VALUES (?, ?, ?)
+        INSERT INTO conversations (chatbot_id, session_id, user_message, bot_response)
+        VALUES (?, ?, ?, ?)
         """,
-        (chatbot_id, user_message, bot_response),
+        (chatbot_id, sid, user_message, bot_response),
     )
     new_id = int(cur.lastrowid)
     logger.info("Saved conversation id=%s chatbot_id=%s", new_id, chatbot_id)
@@ -61,6 +64,62 @@ def top_questions_for_chatbot(
     return [(str(r["question"]), int(r["cnt"])) for r in cur.fetchall()]
 
 
+def get_session_history(
+    conn: sqlite3.Connection,
+    chatbot_id: int,
+    session_id: str,
+    *,
+    limit: int = 10,
+) -> list[dict[str, str]]:
+    """
+    Return the last `limit` exchanges for a session as OpenAI-style role/content dicts.
+    """
+    sid = session_id.strip()
+    if not sid:
+        return []
+    cur = conn.execute(
+        """
+        SELECT user_message, bot_response
+        FROM conversations
+        WHERE chatbot_id = ? AND session_id = ?
+        ORDER BY id DESC
+        LIMIT ?
+        """,
+        (chatbot_id, sid, limit),
+    )
+    rows = cur.fetchall()
+    messages: list[dict[str, str]] = []
+    for row in reversed(rows):
+        messages.append({"role": "user", "content": row["user_message"]})
+        messages.append({"role": "assistant", "content": row["bot_response"]})
+    return messages
+
+
+def stats_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> dict[str, object]:
+    cur = conn.execute(
+        """
+        SELECT
+            COUNT(*) AS total_exchanges,
+            COUNT(DISTINCT CASE
+                WHEN session_id IS NOT NULL AND TRIM(session_id) != ''
+                THEN session_id
+                ELSE 'row-' || id
+            END) AS total_conversations,
+            MAX(created_at) AS last_activity
+        FROM conversations
+        WHERE chatbot_id = ?
+        """,
+        (chatbot_id,),
+    )
+    row = cur.fetchone()
+    exchanges = int(row["total_exchanges"] or 0)
+    return {
+        "total_conversations": int(row["total_conversations"] or 0),
+        "total_messages": exchanges * 2,
+        "last_activity": row["last_activity"],
+    }
+
+
 def get_conversations_by_chatbot(
     conn: sqlite3.Connection,
     chatbot_id: int,
@@ -71,7 +130,7 @@ def get_conversations_by_chatbot(
     logger.debug("get_conversations_by_chatbot chatbot_id=%s limit=%s offset=%s", chatbot_id, limit, offset)
     cur = conn.execute(
         """
-        SELECT id, chatbot_id, user_message, bot_response, created_at
+        SELECT id, chatbot_id, session_id, user_message, bot_response, created_at
         FROM conversations
         WHERE chatbot_id = ?
         ORDER BY id ASC

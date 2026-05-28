@@ -30,7 +30,8 @@ def widget_public_chat(request: Request, body: WidgetChatRequest, db: DbConn) ->
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chatbot not found")
 
     try:
-        out = run_rag_chat(db, body.chatbot_id, body.message)
+        session_id = (body.session_id or "").strip() or None
+        out = run_rag_chat(db, body.chatbot_id, body.message, session_id=session_id)
     except RuntimeError as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -45,6 +46,7 @@ def widget_public_chat(request: Request, body: WidgetChatRequest, db: DbConn) ->
 
     return WidgetChatResponse(
         reply=out.reply,
+        session_id=session_id,
         show_lead_form=out.show_lead_form,
         lead_prompt=out.lead_prompt,
     )

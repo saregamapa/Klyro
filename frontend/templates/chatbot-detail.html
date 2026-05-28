@@ -26,8 +26,8 @@
       <a href="/dashboard/analytics" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white">
         <span>📈</span> Analytics
       </a>
-      <span class="flex cursor-not-allowed items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-500" title="Coming soon">
-        <span>⚙️</span> Settings
+      <span class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-500">
+        <span>⚙️</span> Settings (per bot)
       </span>
     </nav>
   </aside>
@@ -52,7 +52,16 @@
         </button>
       </div>
 
-      <section class="cs-glass mt-10 rounded-2xl p-6">
+      <div class="mt-8 flex flex-wrap gap-2 border-b border-white/10 pb-1" role="tablist">
+        <button type="button" data-tab="embed" class="detail-tab active rounded-t-lg px-4 py-2 text-sm font-medium text-emerald-400">Embed</button>
+        <button type="button" data-tab="settings" class="detail-tab rounded-t-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-white">Settings</button>
+        <button type="button" data-tab="conversations" class="detail-tab rounded-t-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-white">Conversations</button>
+        <button type="button" data-tab="leads" class="detail-tab rounded-t-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-white">Leads</button>
+        <button type="button" data-tab="analytics" class="detail-tab rounded-t-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-white">Analytics</button>
+      </div>
+
+      <div id="tab-embed" class="detail-tab-panel">
+      <section class="cs-glass mt-6 rounded-2xl p-6">
         <h2 class="text-lg font-semibold text-white">Install script</h2>
         <p class="mt-2 text-sm text-slate-400">Paste before closing <code class="text-emerald-400/90">&lt;/body&gt;</code></p>
         <div class="relative mt-4">
@@ -95,43 +104,90 @@
           </form>
         </div>
       </section>
+      </div>
 
-      <section class="cs-glass mt-8 rounded-2xl p-6">
-        <h2 class="text-lg font-semibold text-white">Analytics</h2>
-        <p id="analytics-summary" class="mt-2 text-sm text-slate-400">Loading analytics…</p>
-        <div id="analytics-top-wrap" class="mt-5 hidden">
-          <h3 class="text-sm font-medium text-slate-300">Top visitor questions</h3>
-          <ol id="analytics-top-list" class="mt-2 list-decimal space-y-1.5 pl-5 text-sm text-slate-400"></ol>
-        </div>
-        <div class="mt-6 grid gap-4 sm:grid-cols-2">
-          <div class="rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 text-center">
-            <p class="text-2xl font-bold text-white" id="stat-conv">—</p>
-            <p class="text-xs text-slate-500">Conversations (list API)</p>
-          </div>
-          <div class="rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 text-center">
-            <p class="text-2xl font-bold text-white" id="stat-leads">—</p>
-            <p class="text-xs text-slate-500">Leads captured</p>
-          </div>
-        </div>
-      </section>
+      <div id="tab-settings" class="detail-tab-panel hidden">
+        <section class="cs-glass mt-6 rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-white">Chatbot settings</h2>
+          <form id="settings-form" class="mt-4 space-y-4">
+            <div>
+              <label class="block text-xs font-medium uppercase tracking-wide text-slate-500">Name</label>
+              <input id="settings-name" type="text" class="mt-1 w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium uppercase tracking-wide text-slate-500">Website URL</label>
+              <input id="settings-url" type="url" class="mt-1 w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium uppercase tracking-wide text-slate-500">Accent color</label>
+              <input id="settings-accent" type="color" class="mt-1 h-10 w-20 cursor-pointer rounded border border-slate-600 bg-slate-900" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium uppercase tracking-wide text-slate-500">System prompt</label>
+              <textarea id="settings-prompt" rows="5" class="mt-1 w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-white" placeholder="Optional instructions for how the assistant should behave…"></textarea>
+            </div>
+            <button type="submit" id="settings-save" class="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-500">Save settings</button>
+          </form>
+        </section>
+      </div>
 
-      <section class="cs-glass mt-8 rounded-2xl p-6">
-        <h2 class="text-lg font-semibold text-white">Captured leads</h2>
-        <p class="mt-1 text-sm text-slate-500">From the embed widget when visitors submit the contact form (e.g. after asking about pricing).</p>
-        <p id="leads-empty" class="mt-4 hidden text-sm text-slate-500">No leads yet.</p>
-        <div class="mt-4 overflow-x-auto">
-          <table class="w-full text-left text-sm text-slate-300">
-            <thead>
-              <tr class="border-b border-slate-700 text-xs uppercase tracking-wide text-slate-500">
-                <th class="pb-2 pr-4 font-medium">Name</th>
-                <th class="pb-2 pr-4 font-medium">Email</th>
-                <th class="pb-2 font-medium">Note</th>
-              </tr>
-            </thead>
-            <tbody id="leads-table-body"></tbody>
-          </table>
-        </div>
-      </section>
+      <div id="tab-conversations" class="detail-tab-panel hidden">
+        <section class="cs-glass mt-6 rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-white">Conversation history</h2>
+          <p class="mt-1 text-sm text-slate-500">Recent visitor Q&amp;A stored from the widget.</p>
+          <div id="conversations-list" class="mt-4 space-y-3 text-sm text-slate-300"></div>
+          <p id="conversations-empty" class="mt-4 hidden text-sm text-slate-500">No conversations yet.</p>
+        </section>
+      </div>
+
+      <div id="tab-leads" class="detail-tab-panel hidden">
+        <section class="cs-glass mt-6 rounded-2xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 class="text-lg font-semibold text-white">Captured leads</h2>
+            <button type="button" id="export-leads-csv" class="rounded-lg border border-slate-600 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800">Export CSV</button>
+          </div>
+          <p class="mt-1 text-sm text-slate-500">From the embed widget when visitors submit the contact form.</p>
+          <p id="leads-empty" class="mt-4 hidden text-sm text-slate-500">No leads yet.</p>
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead>
+                <tr class="border-b border-slate-700 text-xs uppercase tracking-wide text-slate-500">
+                  <th class="pb-2 pr-4 font-medium">Name</th>
+                  <th class="pb-2 pr-4 font-medium">Email</th>
+                  <th class="pb-2 font-medium">Note</th>
+                </tr>
+              </thead>
+              <tbody id="leads-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div id="tab-analytics" class="detail-tab-panel hidden">
+        <section class="cs-glass mt-6 rounded-2xl p-6">
+          <h2 class="text-lg font-semibold text-white">Analytics</h2>
+          <p id="analytics-summary" class="mt-2 text-sm text-slate-400">Loading analytics…</p>
+          <div id="analytics-top-wrap" class="mt-5 hidden">
+            <h3 class="text-sm font-medium text-slate-300">Top visitor questions</h3>
+            <ol id="analytics-top-list" class="mt-2 list-decimal space-y-1.5 pl-5 text-sm text-slate-400"></ol>
+          </div>
+          <div class="mt-6 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 text-center">
+              <p class="text-2xl font-bold text-white" id="stat-sessions">—</p>
+              <p class="text-xs text-slate-500">Chat sessions</p>
+            </div>
+            <div class="rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 text-center">
+              <p class="text-2xl font-bold text-white" id="stat-messages">—</p>
+              <p class="text-xs text-slate-500">Messages</p>
+            </div>
+            <div class="rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 text-center">
+              <p class="text-2xl font-bold text-white" id="stat-leads">—</p>
+              <p class="text-xs text-slate-500">Leads captured</p>
+            </div>
+          </div>
+          <p id="stats-last-activity" class="mt-4 text-xs text-slate-500"></p>
+        </section>
+      </div>
     </div>
   </div>
 </div>

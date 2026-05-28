@@ -9,6 +9,7 @@ class ConversationCreate(BaseModel):
 class ConversationPublic(BaseModel):
     id: int
     chatbot_id: int
+    session_id: str = ""
     user_message: str
     bot_response: str
     created_at: str

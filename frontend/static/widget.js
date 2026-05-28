@@ -17,6 +17,7 @@
   var API_ORIGIN =
     SCRIPT.getAttribute("data-api-url") || new URL(SCRIPT.src).origin;
   var THEME = SCRIPT.getAttribute("data-theme") || "light";
+  var ACCENT = SCRIPT.getAttribute("data-accent-color") || "#10b981";
   var ROOT_ID = "klyroai-widget-root";
 
   // Generate or retrieve persistent session ID
@@ -92,7 +93,7 @@
     var headerBorder = isDark ? "border-slate-700" : "border-slate-100";
     var inputBg = isDark ? "bg-slate-800 text-slate-100" : "bg-white text-slate-800";
     var inputBorder = isDark ? "border-slate-600" : "border-slate-200";
-    var bubbleUserBg = "bg-emerald-600";
+    var bubbleUserBg = "";
     var bubbleBotBg = isDark ? "bg-slate-800 border-slate-600" : "bg-slate-50 border-slate-100";
     var bubbleBotText = isDark ? "text-slate-100" : "text-slate-800";
 
@@ -136,10 +137,14 @@
       " " +
       inputBg +
       ' px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" />' +
-      '      <button type="submit" id="klyro-send" class="shrink-0 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50">Send</button>' +
+      '      <button type="submit" id="klyro-send" class="shrink-0 rounded-xl px-4 py-2 text-sm font-medium text-white disabled:opacity-50" style="background-color:' +
+      ACCENT +
+      '">Send</button>' +
       "    </form>" +
       "  </div>" +
-      '  <button type="button" id="klyro-fab" class="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-2xl text-white shadow-lg transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2" aria-label="Open chat">💬</button>' +
+      '  <button type="button" id="klyro-fab" class="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white shadow-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2" style="background-color:' +
+      ACCENT +
+      '" aria-label="Open chat">💬</button>' +
       "</div>";
 
     var panel = root.querySelector("#klyro-panel");
@@ -288,8 +293,11 @@
       var bubble = document.createElement("div");
       bubble.className =
         who === "user"
-          ? "max-w-[95%] rounded-2xl rounded-br-md bg-emerald-600 px-3 py-2 text-white"
+          ? "max-w-[95%] rounded-2xl rounded-br-md px-3 py-2 text-white"
           : "max-w-[95%] rounded-2xl rounded-bl-md border border-slate-100 bg-slate-50 px-3 py-2 text-slate-800";
+      if (who === "user") {
+        bubble.style.backgroundColor = ACCENT;
+      }
       // For bot messages, render markdown; for user messages, just escape
       if (who === "bot") {
         bubble.innerHTML = renderMarkdown(text).replace(/\n/g, "<br/>");
