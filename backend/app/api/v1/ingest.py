@@ -9,10 +9,10 @@ from fastapi import APIRouter, Body, File, HTTPException, Path, UploadFile, stat
 from app.api.chatbot_access import require_owned_chatbot
 from app.api.deps import CurrentUser, DbConn
 from app.core.config import settings
-from app.repositories import ingest_repo
-from app.schemas.ingest import IngestFilesResponse, IngestRequest, IngestResponse
+from app.repositories import ingest_repo, job_repo
+from app.schemas.ingest import IngestFilesResponse, IngestJobResponse, IngestRequest
 from app.services.document_extract import SUPPORTED_EXTENSIONS, extract_plain_text, normalize_extension
-from app.services.website_ingest import build_chunk_records, chunk_words, crawl_site, same_registrable_domain
+from app.services.website_ingest import chunk_words
 
 logger = logging.getLogger(__name__)
 
@@ -21,61 +21,28 @@ router = APIRouter(prefix="/chatbots", tags=["ingest"])
 
 @router.post(
     "/{chatbot_id}/ingest",
-    status_code=status.HTTP_200_OK,
-    response_model=IngestResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=IngestJobResponse,
 )
 def ingest_chatbot_website(
     chatbot_id: Annotated[int, Path(..., ge=1)],
     db: DbConn,
     current_user: CurrentUser,
     body: Annotated[Optional[IngestRequest], Body()] = None,
-) -> IngestResponse:
+) -> IngestJobResponse:
     row = require_owned_chatbot(db, chatbot_id, current_user.id)
-
-    seed: Optional[str] = None
-    if body and body.url is not None:
-        seed = str(body.url)
-    elif row.get("website_url"):
-        seed = row["website_url"]
-
+    seed = (body.url if body and body.url else row.get("website_url") or "")
     if not seed:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Provide a url in the body or set the chatbot website_url first",
+            detail="Provide a url or set chatbot website_url first",
         )
 
-    stored_website = row.get("website_url")
-    if body and body.url is not None and stored_website:
-        if not same_registrable_domain(stored_website, seed):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Ingest url must be on the same domain as the chatbot website_url",
-            )
-
-    try:
-        pages = crawl_site(seed)
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        ) from e
-
-    chunk_rows = build_chunk_records(pages)
-
-    ingest_repo.delete_chunks_for_chatbot(db, chatbot_id)
-    stored = ingest_repo.insert_chunks(db, chatbot_id, chunk_rows)
-
-    logger.info(
-        "Ingest complete chatbot_id=%s pages=%s chunks=%s",
-        chatbot_id,
-        len(pages),
-        stored,
-    )
-
-    return IngestResponse(
-        pages_crawled=len(pages),
-        chunks_stored=stored,
-        urls=[p.url for p in pages],
+    job_id = job_repo.enqueue(db, chatbot_id, "website_ingest", {"url": str(seed)})
+    return IngestJobResponse(
+        job_id=job_id,
+        status="pending",
+        message="Ingest queued. Poll GET /api/v1/jobs/{job_id} for status.",
     )
 
 
@@ -125,7 +92,6 @@ def ingest_chatbot_files(
             )
             continue
 
-        # Sync endpoint + sync DB: avoid async def here — SQLite connections are thread-local.
         data = uf.file.read(max_bytes + 1)
         if len(data) > max_bytes:
             warnings.append(f"{safe}: file too large (max {max_bytes // (1024 * 1024)} MiB)")
@@ -172,12 +138,15 @@ def ingest_chatbot_files(
     triples = [(url, start + i, content) for i, (url, content) in enumerate(pairs)]
     stored = ingest_repo.insert_chunks(db, chatbot_id, triples)
 
+    job_id = job_repo.enqueue(db, chatbot_id, "file_embed")
+
     logger.info(
-        "Ingest files chatbot_id=%s files_ok=%s chunks=%s warnings=%s",
+        "Ingest files chatbot_id=%s files_ok=%s chunks=%s warnings=%s job_id=%s",
         chatbot_id,
         files_ok,
         stored,
         len(warnings),
+        job_id,
     )
 
     return IngestFilesResponse(
@@ -185,4 +154,5 @@ def ingest_chatbot_files(
         chunks_stored=stored,
         sources=sources,
         warnings=warnings,
+        job_id=job_id,
     )

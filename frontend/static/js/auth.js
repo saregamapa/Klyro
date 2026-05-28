@@ -49,6 +49,9 @@
             throw new Error(typeof data.detail === "string" ? data.detail : "Login failed");
           }
           localStorage.setItem("klyro_token", data.access_token);
+          if (data.refresh_token) {
+            localStorage.setItem("klyro_refresh_token", data.refresh_token);
+          }
           localStorage.removeItem("chatsite_token");
           if (window.CS && window.CS.toast) window.CS.toast("Welcome back!", "success");
           window.location.href = "/dashboard";
@@ -104,6 +107,9 @@
             throw new Error("Account created — please log in.");
           }
           localStorage.setItem("klyro_token", loginData.access_token);
+          if (loginData.refresh_token) {
+            localStorage.setItem("klyro_refresh_token", loginData.refresh_token);
+          }
           localStorage.removeItem("chatsite_token");
           if (window.CS && window.CS.toast) window.CS.toast("Account created!", "success");
           window.location.href = "/dashboard";
@@ -116,4 +122,38 @@
       });
     },
   };
+
+  // Silent token refresh — runs on every page load
+  (async function refreshOnLoad() {
+    var tok = localStorage.getItem("klyro_token");
+    var ref = localStorage.getItem("klyro_refresh_token");
+    if (!tok || !ref) return;
+
+    try {
+      var parts = tok.split(".");
+      if (parts.length !== 3) return;
+      var payload = JSON.parse(atob(parts[1]));
+      var expiresAt = payload.exp * 1000;
+      var fiveMin = 5 * 60 * 1000;
+      if (Date.now() < expiresAt - fiveMin) return;
+    } catch (_) {
+      return;
+    }
+
+    try {
+      var res = await fetch("/api/v1/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: ref }),
+      });
+      if (!res.ok) {
+        localStorage.removeItem("klyro_token");
+        localStorage.removeItem("klyro_refresh_token");
+        return;
+      }
+      var data = await res.json();
+      localStorage.setItem("klyro_token", data.access_token);
+      if (data.refresh_token) localStorage.setItem("klyro_refresh_token", data.refresh_token);
+    } catch (_) {}
+  })();
 })();

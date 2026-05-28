@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import uuid
 from contextlib import asynccontextmanager
@@ -17,6 +18,7 @@ from starlette.responses import JSONResponse
 from app.api import api_router
 from app.core.config import settings
 from app.db.init_db import init_db
+from app.services.job_worker import run_worker_loop
 
 
 def _configure_db_logging() -> None:
@@ -44,10 +46,29 @@ def _configure_db_logging() -> None:
 async def lifespan(_app: FastAPI):
     _configure_db_logging()
     init_db()
+    worker_task = asyncio.create_task(run_worker_loop())
     yield
+    worker_task.cancel()
+    try:
+        await worker_task
+    except asyncio.CancelledError:
+        pass
 
 
 def create_app() -> FastAPI:
+    if settings.sentry_dsn:
+        import sentry_sdk
+
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            environment=settings.environment,
+            traces_sample_rate=settings.sentry_traces_sample_rate,
+            send_default_pii=False,
+        )
+        logging.getLogger(__name__).info(
+            "Sentry initialised (environment=%s)", settings.environment
+        )
+
     app = FastAPI(
         title=settings.app_name,
         debug=settings.debug,
@@ -132,6 +153,19 @@ def create_app() -> FastAPI:
     @app.get("/login")
     async def login_page(request: Request):
         return _html("login.html", request, page_title="Log in")
+
+    @app.get("/forgot-password")
+    async def forgot_password_page(request: Request):
+        return _html("forgot-password.html", request, page_title="Reset password")
+
+    @app.get("/reset-password")
+    async def reset_password_page(request: Request, token: str = ""):
+        return _html(
+            "reset-password.html",
+            request,
+            page_title="Set new password",
+            token=token,
+        )
 
     @app.get("/signup")
     async def signup_page(request: Request):

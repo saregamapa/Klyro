@@ -34,6 +34,16 @@ services:
         sync: false
       - key: APP_BASE_URL
         sync: false
+      - key: REDIS_URL
+        fromService:
+          name: klyro-redis
+          type: redis
+          property: connectionString
+
+  - type: redis
+    name: klyro-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
 
 databases:
   - name: klyro-db

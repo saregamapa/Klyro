@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS chatbots (
     system_prompt   TEXT DEFAULT '',
     accent_color    TEXT DEFAULT '#6366f1',
     scraped_content TEXT DEFAULT '',
+    allowed_origins TEXT DEFAULT '',
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -99,6 +100,43 @@ CREATE INDEX IF NOT EXISTS idx_ingest_chunks_chatbot_id ON ingest_chunks(chatbot
 CREATE INDEX IF NOT EXISTS idx_chunk_emb_chatbot_id ON chunk_embeddings(chatbot_id);
 CREATE INDEX IF NOT EXISTS idx_message_usage_user ON message_usage(user_id, period);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_cust ON subscriptions(stripe_customer_id);
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  TEXT NOT NULL UNIQUE,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    revoked_at  TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens(token_hash);
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  TEXT NOT NULL UNIQUE,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    used_at     TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_pw_reset_hash ON password_reset_tokens(token_hash);
+
+CREATE TABLE IF NOT EXISTS ingest_jobs (
+    id          BIGSERIAL PRIMARY KEY,
+    chatbot_id  BIGINT NOT NULL REFERENCES chatbots(id) ON DELETE CASCADE,
+    job_type    TEXT NOT NULL DEFAULT 'website',
+    status      TEXT NOT NULL DEFAULT 'pending'
+                CHECK (status IN ('pending','running','done','error')),
+    payload     JSONB,
+    result      JSONB,
+    error       TEXT,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    started_at  TIMESTAMPTZ,
+    finished_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS idx_ingest_jobs_status  ON ingest_jobs(status, created_at);
+CREATE INDEX IF NOT EXISTS idx_ingest_jobs_chatbot ON ingest_jobs(chatbot_id);
 """
 
 _SQLITE_DDL = [
@@ -182,6 +220,36 @@ _SQLITE_DDL = [
     "CREATE INDEX IF NOT EXISTS idx_ingest_chunks_chatbot_id ON ingest_chunks(chatbot_id)",
     "CREATE INDEX IF NOT EXISTS idx_chunk_emb_chatbot_id ON chunk_embeddings(chatbot_id)",
     "CREATE INDEX IF NOT EXISTS idx_message_usage_user ON message_usage(user_id, period)",
+    """CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash  TEXT NOT NULL UNIQUE,
+        expires_at  TIMESTAMP NOT NULL,
+        revoked_at  TIMESTAMP,
+        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
+    "CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens(token_hash)",
+    """CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token_hash  TEXT NOT NULL UNIQUE,
+        expires_at  TIMESTAMP NOT NULL,
+        used_at     TIMESTAMP,
+        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
+    """CREATE TABLE IF NOT EXISTS ingest_jobs (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        chatbot_id  INTEGER NOT NULL REFERENCES chatbots(id) ON DELETE CASCADE,
+        job_type    TEXT NOT NULL DEFAULT 'website',
+        status      TEXT NOT NULL DEFAULT 'pending',
+        payload     TEXT,
+        result      TEXT,
+        error       TEXT,
+        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        started_at  TIMESTAMP,
+        finished_at TIMESTAMP
+    )""",
+    "CREATE INDEX IF NOT EXISTS idx_ingest_jobs_status ON ingest_jobs(status, created_at)",
 ]
 
 
@@ -197,6 +265,16 @@ def init_db() -> None:
                 conn.execute(stmt)
             _sqlite_legacy_migrations(conn)
         conn.commit()
+        if settings.use_postgres:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "ALTER TABLE chatbots ADD COLUMN IF NOT EXISTS allowed_origins TEXT DEFAULT ''"
+                    )
+                conn.commit()
+            except Exception as e:
+                logger.debug("allowed_origins migration: %s", e)
+                conn.rollback()
         backend = "postgres" if settings.use_postgres else "sqlite"
         logger.info("DB schema ensured (backend=%s)", backend)
     except Exception:
@@ -216,6 +294,7 @@ def _sqlite_legacy_migrations(conn) -> None:
         ("chatbots", "accent_color", "TEXT DEFAULT '#6366f1'"),
         ("chatbots", "scraped_content", "TEXT DEFAULT ''"),
         ("conversations", "session_id", "TEXT DEFAULT ''"),
+        ("chatbots", "allowed_origins", "TEXT DEFAULT ''"),
     ]:
         try:
             conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {typedef}")

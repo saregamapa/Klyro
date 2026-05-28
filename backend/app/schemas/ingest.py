@@ -3,6 +3,12 @@ from typing import Optional
 from pydantic import BaseModel, Field, HttpUrl
 
 
+class IngestJobResponse(BaseModel):
+    job_id: int
+    status: str
+    message: str
+
+
 class IngestRequest(BaseModel):
     """Optional override URL; otherwise the chatbot's stored website_url is used."""
 
@@ -23,3 +29,4 @@ class IngestFilesResponse(BaseModel):
     chunks_stored: int
     sources: list[str] = Field(description="Logical source labels, e.g. upload:filename.pdf")
     warnings: list[str] = Field(default_factory=list)
+    job_id: Optional[int] = None

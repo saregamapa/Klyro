@@ -10,6 +10,7 @@ from app.api.v1 import (
     conversations,
     health,
     ingest,
+    jobs,
     leads,
     rag,
     users,
@@ -26,6 +27,7 @@ router.include_router(chat.router)
 router.include_router(chatbots.router)
 router.include_router(chat_proxy.router)
 router.include_router(ingest.router)
+router.include_router(jobs.router)
 router.include_router(rag.router)
 router.include_router(conversations.router)
 router.include_router(leads.router)

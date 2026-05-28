@@ -40,6 +40,7 @@ class ChatbotUpdate(BaseModel):
     website_url: Optional[HttpUrl] = None
     system_prompt: Optional[str] = Field(None, max_length=8000)
     accent_color: Optional[str] = Field(None, min_length=4, max_length=32)
+    allowed_origins: Optional[str] = None
 
     @field_validator("name", mode="before")
     @classmethod
@@ -69,6 +70,7 @@ class ChatbotPublic(BaseModel):
     system_prompt: str = ""
     accent_color: str = "#6366f1"
     scraped_content: str = ""
+    allowed_origins: str = ""
     created_at: str
 
 

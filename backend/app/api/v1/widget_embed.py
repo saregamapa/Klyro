@@ -5,6 +5,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request, status
 
 from app.api.deps import DbConn, check_owner_message_quota
+from app.api.origin_check import origin_allowed
 from app.core.rate_limit import limiter
 from app.repositories import chatbot_repo, lead_repo, usage_repo
 from app.schemas.widget import WidgetChatRequest, WidgetChatResponse
@@ -26,6 +27,14 @@ def widget_public_chat(request: Request, body: WidgetChatRequest, db: DbConn) ->
     row = chatbot_repo.get_chatbot_by_id(db, body.chatbot_id)
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chatbot not found")
+
+    origin_str = request.headers.get("origin")
+    if not origin_allowed(row, origin_str):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This domain is not authorised to use this chatbot. "
+            "Add it under chatbot settings → Allowed Origins.",
+        )
 
     owner_id = int(row["user_id"])
     check_owner_message_quota(db, owner_id)

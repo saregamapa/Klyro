@@ -31,6 +31,43 @@
     return { Authorization: "Bearer " + t };
   }
 
+  function pollJob(jobId, headers, onProgress, onDone, onError) {
+    var interval = setInterval(async function () {
+      try {
+        var r = await fetch("/api/v1/jobs/" + jobId, { headers: headers });
+        var data = await r.json();
+        if (data.status === "running" || data.status === "pending") {
+          if (onProgress) onProgress(data.status);
+          return;
+        }
+        if (data.status === "done") {
+          clearInterval(interval);
+          onDone(data.result);
+        } else if (data.status === "error") {
+          clearInterval(interval);
+          onError(data.error || "Job failed");
+        }
+      } catch (_) {
+        clearInterval(interval);
+        onError("Network error");
+      }
+    }, 3000);
+  }
+
+  function waitForJob(jobId, headers, statusMsg, setBar, pct) {
+    return new Promise(function (resolve, reject) {
+      pollJob(
+        jobId,
+        headers,
+        function (st) {
+          if (setBar && statusMsg) setBar(pct, statusMsg + " (" + st + ")…");
+        },
+        resolve,
+        reject
+      );
+    });
+  }
+
   function requireAuth() {
     if (!getToken()) {
       window.location.href = "/login";
@@ -189,19 +226,29 @@
           if (!Number.isFinite(id) || id < 1) throw new Error("Invalid response from server");
 
           if (websiteUrl) {
-            setBar(35, "Crawling your website…");
+            setBar(35, "Queuing website crawl…");
             var ingestRes = await fetch("/api/v1/chatbots/" + id + "/ingest", {
               method: "POST",
               headers: h,
               body: "{}",
             });
+            var ingestData = await ingestRes.json().catch(function () {
+              return {};
+            });
             if (!ingestRes.ok) {
-              var ingErr = await ingestRes.json().catch(function () {
-                return {};
-              });
-              throw new Error(ingErr.detail || "Ingest failed — check the website URL");
+              throw new Error(ingestData.detail || "Ingest failed — check the website URL");
             }
-            setBar(55, "Website content saved.");
+            if (ingestData.job_id) {
+              setBar(45, "Crawling your website…");
+              await waitForJob(
+                ingestData.job_id,
+                h,
+                "Training on website",
+                setBar,
+                65
+              );
+            }
+            setBar(70, "Website content saved.");
           }
 
           if (hasFiles) {
@@ -242,26 +289,20 @@
               var more = ingestFileData.warnings.length > 1 ? " (+" + (ingestFileData.warnings.length - 1) + ")" : "";
               window.CS.toast(w0 + more, "info");
             }
-            setBar(websiteUrl ? 75 : 55, "Documents saved.");
+            if (ingestFileData.job_id) {
+              setBar(websiteUrl ? 80 : 60, "Creating embeddings…");
+              await waitForJob(
+                ingestFileData.job_id,
+                h,
+                "Embedding documents",
+                setBar,
+                90
+              );
+            }
+            setBar(websiteUrl ? 85 : 75, "Documents saved.");
           }
 
           if (websiteUrl || hasFiles) {
-            setBar(85, "Creating embeddings…");
-            var embedRes = await fetch("/api/v1/chatbots/" + id + "/embed", {
-              method: "POST",
-              headers: h,
-            });
-            if (!embedRes.ok) {
-              var emErr = await embedRes.json().catch(function () {
-                return {};
-              });
-              var emDetail = emErr.detail;
-              throw new Error(
-                typeof emDetail === "string"
-                  ? emDetail
-                  : "Embed failed — check OPENAI_API_KEY and billing at platform.openai.com"
-              );
-            }
             setBar(100, "Done!");
             if (window.CS && window.CS.toast) window.CS.toast("Chatbot trained successfully", "success");
           } else {
@@ -337,10 +378,12 @@
           var sUrl = document.getElementById("settings-url");
           var sAccent = document.getElementById("settings-accent");
           var sPrompt = document.getElementById("settings-prompt");
+          var sOrigins = document.getElementById("allowed-origins");
           if (sName) sName.value = bot.name || "";
           if (sUrl) sUrl.value = bot.website_url || "";
           if (sAccent) sAccent.value = accent;
           if (sPrompt) sPrompt.value = bot.system_prompt || "";
+          if (sOrigins) sOrigins.value = bot.allowed_origins || "";
 
           var settingsForm = document.getElementById("settings-form");
           if (settingsForm) {
@@ -351,6 +394,7 @@
                 website_url: sUrl && sUrl.value.trim() ? sUrl.value.trim() : null,
                 accent_color: sAccent ? sAccent.value : accent,
                 system_prompt: sPrompt ? sPrompt.value : "",
+                allowed_origins: sOrigins ? sOrigins.value : "",
               };
               fetch("/api/v1/chatbots/" + id, {
                 method: "PATCH",

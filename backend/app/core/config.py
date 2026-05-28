@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -57,6 +58,34 @@ class Settings(BaseSettings):
     stripe_price_pro: str = ""
     stripe_price_agency: str = ""
     app_base_url: str = "http://localhost:8000"
+
+    # ── Email (Resend) ───────────────────────────────────────────────────────────
+    resend_api_key: str = ""
+    email_from: str = "Klyro <noreply@klyro.ai>"
+    email_enabled: bool = True
+
+    # ── Redis (rate limiting) ────────────────────────────────────────────────────
+    redis_url: str = ""
+
+    # ── Sentry ───────────────────────────────────────────────────────────────────
+    sentry_dsn: str = ""
+    sentry_traces_sample_rate: float = 0.1
+
+    @model_validator(mode="after")
+    def _validate_production_config(self) -> "Settings":
+        if self.environment == "production":
+            if self.secret_key in (
+                "change-me-in-production",
+                "dev-only-change-me-use-openssl-rand-hex-32-in-prod",
+                "",
+            ):
+                raise ValueError(
+                    "SECRET_KEY must be set to a secure value in production.\n"
+                    "Generate one with:  openssl rand -hex 32"
+                )
+        if self.use_postgres and self.vector_backend == "sqlite":
+            object.__setattr__(self, "vector_backend", "pgvector")
+        return self
 
     @property
     def use_postgres(self) -> bool:

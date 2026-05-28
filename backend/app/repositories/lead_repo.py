@@ -82,7 +82,35 @@ def upsert_lead_email(
                 (name, phone, lead_id),
             )
         return lead_id
-    return create_lead(conn, chatbot_id, name, em, None)
+    lead_id = create_lead(conn, chatbot_id, name, em, None)
+
+    try:
+        import threading
+
+        from app.db.database import db_execute, row_to_dict
+
+        cur = db_execute(
+            conn,
+            """
+            SELECT c.name, u.email FROM chatbots c
+            JOIN users u ON u.id = c.user_id
+            WHERE c.id = %s
+            """,
+            (chatbot_id,),
+        )
+        meta = row_to_dict(cur.fetchone())
+        if meta:
+            from app.services.email import send_lead_notification
+
+            threading.Thread(
+                target=send_lead_notification,
+                args=(meta["email"], meta["name"], email, name or ""),
+                daemon=True,
+            ).start()
+    except Exception:
+        pass
+
+    return lead_id
 
 
 def count_leads_for_chatbot(conn: Any, chatbot_id: int) -> int:

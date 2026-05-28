@@ -345,6 +345,15 @@
           return {};
         });
         if (!res.ok) {
+          if (res.status === 403) {
+            removeTypingIndicator();
+            appendBubble(
+              "This chatbot is not configured for this domain. " +
+                "Contact the site owner to resolve this.",
+              "bot"
+            );
+            return;
+          }
           throw new Error(formatApiError(data) || res.statusText);
         }
         if (!data.reply && data.reply !== "") {

@@ -33,7 +33,7 @@ def get_chatbots_by_user(conn: Any, user_id: int) -> list[dict[str, Any]]:
         conn,
         """
         SELECT id, user_id, name, website_url, system_prompt, accent_color,
-               scraped_content, created_at
+               scraped_content, allowed_origins, created_at
         FROM chatbots
         WHERE user_id = %s
         ORDER BY id DESC
@@ -48,7 +48,7 @@ def get_chatbot_by_id(conn: Any, chatbot_id: int) -> dict[str, Any] | None:
         conn,
         """
         SELECT id, user_id, name, website_url, system_prompt, accent_color,
-               scraped_content, created_at
+               scraped_content, allowed_origins, created_at
         FROM chatbots
         WHERE id = %s
         """,
@@ -66,6 +66,7 @@ def update_chatbot(
     website_url: str | None = None,
     system_prompt: str | None = None,
     accent_color: str | None = None,
+    allowed_origins: str | None = None,
 ) -> bool:
     row = get_chatbot_by_id(conn, chatbot_id)
     if row is None or row["user_id"] != user_id:
@@ -85,6 +86,9 @@ def update_chatbot(
     if accent_color is not None:
         fields.append("accent_color = %s")
         values.append(accent_color)
+    if allowed_origins is not None:
+        fields.append("allowed_origins = %s")
+        values.append(allowed_origins)
     if not fields:
         return True
 

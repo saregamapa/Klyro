@@ -1,6 +1,12 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
   db:
     image: pgvector/pgvector:pg16
     environment:
@@ -25,8 +31,10 @@ services:
     environment:
       DATABASE_URL: postgresql://klyro:klyro@db:5432/klyro
       VECTOR_BACKEND: pgvector
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       - db
+      - redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]

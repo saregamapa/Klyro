@@ -1,0 +1,51 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: klyro_test
+          POSTGRES_USER: klyro
+          POSTGRES_PASSWORD: klyro
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+
+      - name: Run tests
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-test-secret-key-32-chars-minimum
+          ENVIRONMENT: development
+          DATABASE_URL: postgresql://klyro:klyro@localhost:5432/klyro_test
+          VECTOR_BACKEND: pgvector
+          OPENAI_API_KEY: ""
+          EMAIL_ENABLED: "false"
+          STRIPE_SECRET_KEY: ""
+        run: pytest tests/ -v --tb=short

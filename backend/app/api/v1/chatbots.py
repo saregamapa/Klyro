@@ -33,6 +33,7 @@ def _to_public(row: dict[str, Any]) -> ChatbotPublic:
         system_prompt=str(row.get("system_prompt") or ""),
         accent_color=str(row.get("accent_color") or "#6366f1"),
         scraped_content=str(row.get("scraped_content") or ""),
+        allowed_origins=str(row.get("allowed_origins") or ""),
         created_at=str(row["created_at"]),
     )
 
@@ -106,6 +107,7 @@ def update_chatbot(
         website_url=website_url,
         system_prompt=body.system_prompt,
         accent_color=body.accent_color,
+        allowed_origins=body.allowed_origins,
     )
     if not updated:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chatbot not found")

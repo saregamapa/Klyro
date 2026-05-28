@@ -126,6 +126,20 @@
               <label class="block text-xs font-medium uppercase tracking-wide text-slate-500">System prompt</label>
               <textarea id="settings-prompt" rows="5" class="mt-1 w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-white" placeholder="Optional instructions for how the assistant should behave…"></textarea>
             </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-300">Allowed Origins</label>
+              <p class="mt-1 text-xs text-slate-500 mb-2">
+                Comma-separated origins allowed to embed this bot, e.g.
+                <code class="text-emerald-400/90">https://yoursite.com,https://app.yoursite.com</code>.
+                Leave blank to allow all origins (useful during development).
+              </p>
+              <input
+                id="allowed-origins"
+                type="text"
+                placeholder="https://yoursite.com"
+                class="w-full rounded-xl border border-slate-600 bg-slate-900 px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
             <button type="submit" id="settings-save" class="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-500">Save settings</button>
           </form>
         </section>
