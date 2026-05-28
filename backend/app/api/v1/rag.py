@@ -6,7 +6,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Path, status
 
 from app.api.chatbot_access import require_owned_chatbot
-from app.api.deps import CurrentUser, DbConn
+from app.api.deps import CurrentUser, DbConn, MessageQuotaOk
+from app.repositories import usage_repo
 from app.core.config import settings
 from app.repositories import embedding_repo
 from app.schemas.rag import EmbedResponse, RetrieveHit, RetrieveRequest, RetrieveResponse
@@ -107,6 +108,7 @@ def retrieve_chatbot_chunks(
     db: DbConn,
     current_user: CurrentUser,
     body: RetrieveRequest,
+    _quota: MessageQuotaOk,
 ) -> RetrieveResponse:
     require_owned_chatbot(db, chatbot_id, current_user.id)
     _require_openai()
@@ -153,4 +155,8 @@ def retrieve_chatbot_chunks(
                 chunk_index=row["chunk_index"],
             )
         )
+    try:
+        usage_repo.increment_message_count(db, current_user.id)
+    except Exception:
+        logger.exception("Failed to increment usage user_id=%s", current_user.id)
     return RetrieveResponse(results=results)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
 from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Path, status
 
 from app.api.chatbot_access import require_owned_chatbot
-from app.api.deps import CurrentUser, DbConn
+from app.api.deps import ChatbotQuotaOk, CurrentUser, DbConn
+from app.db.database import is_integrity_error
 from app.repositories import chatbot_repo, conversation_repo, lead_repo
 from app.schemas.chatbot import (
     ChatbotCreate,
@@ -47,6 +47,7 @@ def create_chatbot(
     db: DbConn,
     current_user: CurrentUser,
     background_tasks: BackgroundTasks,
+    _quota: ChatbotQuotaOk,
 ) -> ChatbotCreated:
     website_url = str(body.website_url) if body.website_url is not None else None
     try:
@@ -56,7 +57,9 @@ def create_chatbot(
             body.name,
             website_url,
         )
-    except sqlite3.IntegrityError:
+    except Exception as e:
+        if not is_integrity_error(e):
+            raise
         logger.warning("create_chatbot integrity failure user_id=%s", current_user.id)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

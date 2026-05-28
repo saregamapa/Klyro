@@ -9,11 +9,7 @@ def _backend_dir() -> Path:
 
 def _env_files() -> tuple[str, ...]:
     backend = _backend_dir()
-    root = backend.parent
-    return (
-        str(backend / ".env"),
-        str(root / ".env"),
-    )
+    return (str(backend / ".env"), str(backend.parent / ".env"))
 
 
 class Settings(BaseSettings):
@@ -30,36 +26,41 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
 
+    database_url: str = ""
+    database_path: str = "database.db"
+
     frontend_static_dir: str = "../frontend/static"
     frontend_templates_dir: str = "../frontend/templates"
 
-    # SQLite database file (relative to backend/ unless absolute)
-    database_path: str = "database.db"
-
-    # Website ingest (crawl + chunk)
     ingest_max_depth: int = 2
     ingest_max_pages: int = 40
     ingest_request_timeout_seconds: float = 15.0
     ingest_chunk_min_words: int = 500
     ingest_chunk_max_words: int = 1000
     ingest_max_upload_files: int = 30
-    ingest_max_upload_bytes_per_file: int = 35 * 1024 * 1024  # 35 MiB per file
+    ingest_max_upload_bytes_per_file: int = 35 * 1024 * 1024
 
-    # OpenAI embeddings
     openai_api_key: str = ""
     openai_embedding_model: str = "text-embedding-3-small"
     openai_chat_model: str = "gpt-4o-mini"
-
-    # RAG chat
     rag_chat_top_k: int = 5
 
-    # Vector search: "sqlite" (local BLOB + numpy) or "pinecone"
     vector_backend: str = "sqlite"
     pinecone_api_key: str = ""
     pinecone_index_name: str = ""
 
-    # CORS — comma-separated origins or * (embeddable widget on third-party sites)
     cors_allow_origins: str = "*"
+
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_starter: str = ""
+    stripe_price_pro: str = ""
+    stripe_price_agency: str = ""
+    app_base_url: str = "http://localhost:8000"
+
+    @property
+    def use_postgres(self) -> bool:
+        return bool(self.database_url and self.database_url.startswith("postgresql"))
 
     @property
     def cors_origins_list(self) -> list[str]:

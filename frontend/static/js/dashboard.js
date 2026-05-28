@@ -82,6 +82,7 @@
       var loM = document.getElementById("logout-btn-mobile");
       if (loM) loM.addEventListener("click", doLogout);
       loadChatbots();
+      loadPlanUsage();
     },
 
     initCreate: function () {
@@ -580,6 +581,35 @@
         });
     },
   };
+
+  async function loadPlanUsage() {
+    var h = authHeaders();
+    if (!h) return;
+    try {
+      var res = await fetch("/api/v1/billing/usage", { headers: h });
+      var u = await res.json();
+      if (!res.ok) return;
+      var bar = document.getElementById("plan-usage-bar");
+      var text = document.getElementById("plan-usage-text");
+      if (!bar || !text) return;
+      var msgLim = u.messages_limit < 0 ? "∞" : u.messages_limit;
+      var botLim = u.chatbots_limit < 0 ? "∞" : u.chatbots_limit;
+      text.textContent =
+        (u.plan || "free") +
+        " plan · " +
+        u.messages_used +
+        "/" +
+        msgLim +
+        " messages · " +
+        u.chatbots_used +
+        "/" +
+        botLim +
+        " chatbots";
+      bar.classList.remove("hidden");
+    } catch (e) {
+      /* non-blocking */
+    }
+  }
 
   async function loadChatbots() {
     var h = authHeaders();

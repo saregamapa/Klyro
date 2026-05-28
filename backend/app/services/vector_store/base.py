@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
-
-import sqlite3
+from typing import Any, Protocol
 
 
 @dataclass(frozen=True)
@@ -13,12 +11,9 @@ class VectorQueryResult:
 
 
 class VectorStore(Protocol):
-    """Pluggable vector storage (SQLite blobs + numpy, or Pinecone)."""
-
     backend_name: str
 
-    def delete_for_chatbot(self, chatbot_id: int, conn: sqlite3.Connection | None = None) -> None:
-        """Remove all vectors for a chatbot before re-embedding."""
+    def delete_for_chatbot(self, chatbot_id: int, conn: Any | None = None) -> None: ...
 
     def upsert(
         self,
@@ -27,15 +22,13 @@ class VectorStore(Protocol):
         *,
         model: str,
         dimension: int,
-        conn: sqlite3.Connection | None = None,
-    ) -> None:
-        """items: (ingest_chunk_id, embedding) — embeddings must be L2-normalized."""
+        conn: Any | None = None,
+    ) -> None: ...
 
     def search(
         self,
         chatbot_id: int,
         query_embedding: list[float],
         top_k: int,
-        conn: sqlite3.Connection | None = None,
-    ) -> list[VectorQueryResult]:
-        """Return top_k results by similarity (higher score = more similar)."""
+        conn: Any | None = None,
+    ) -> list[VectorQueryResult]: ...

@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.v1 import (
     analytics,
     auth,
+    billing,
     chat,
     chat_proxy,
     chatbots,
@@ -18,6 +19,7 @@ from app.api.v1 import (
 router = APIRouter()
 router.include_router(health.router)
 router.include_router(auth.router)
+router.include_router(billing.router)
 router.include_router(users.router)
 router.include_router(analytics.router)
 router.include_router(chat.router)

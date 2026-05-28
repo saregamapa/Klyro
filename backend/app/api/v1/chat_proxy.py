@@ -4,18 +4,16 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Request, status
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
-from app.api.deps import DbConn
-from app.repositories import chatbot_repo, lead_repo
+from app.api.deps import DbConn, check_owner_message_quota
+from app.core.rate_limit import limiter
+from app.repositories import chatbot_repo, lead_repo, usage_repo
 from app.schemas.chat_proxy import PublicChatRequest, PublicChatResponse
 from app.services.rag_chat import run_rag_chat
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/chatbots", tags=["chat"])
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/{chatbot_id}/chat", response_model=PublicChatResponse)
@@ -32,6 +30,9 @@ def public_chatbot_chat(
     row = chatbot_repo.get_chatbot_by_id(db, chatbot_id)
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chatbot not found")
+
+    owner_id = int(row["user_id"])
+    check_owner_message_quota(db, owner_id)
 
     try:
         out = run_rag_chat(db, chatbot_id, body.message, session_id=body.session_id)
@@ -57,6 +58,11 @@ def public_chatbot_chat(
             lead_repo.upsert_lead_email(db, chatbot_id, str(body.lead_email))
         except Exception:
             logger.exception("Lead upsert failed chatbot_id=%s", chatbot_id)
+
+    try:
+        usage_repo.increment_message_count(db, owner_id)
+    except Exception:
+        logger.exception("Failed to increment message usage owner_id=%s", owner_id)
 
     return PublicChatResponse(
         reply=out.reply,

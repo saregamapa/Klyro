@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, HTTPException, Request, status
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
-from app.api.deps import DbConn
-from app.repositories import chatbot_repo, lead_repo
+from app.api.deps import DbConn, check_owner_message_quota
+from app.core.rate_limit import limiter
+from app.repositories import chatbot_repo, lead_repo, usage_repo
 from app.schemas.widget import WidgetChatRequest, WidgetChatResponse
 from app.schemas.widget_lead import WidgetLeadCreate, WidgetLeadCreated
 from app.services.rag_chat import run_rag_chat
@@ -15,7 +14,6 @@ from app.services.rag_chat import run_rag_chat
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/widget", tags=["widget"])
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/chat", response_model=WidgetChatResponse)
@@ -28,6 +26,9 @@ def widget_public_chat(request: Request, body: WidgetChatRequest, db: DbConn) ->
     row = chatbot_repo.get_chatbot_by_id(db, body.chatbot_id)
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chatbot not found")
+
+    owner_id = int(row["user_id"])
+    check_owner_message_quota(db, owner_id)
 
     try:
         session_id = (body.session_id or "").strip() or None
@@ -43,6 +44,11 @@ def widget_public_chat(request: Request, body: WidgetChatRequest, db: DbConn) ->
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Chat failed",
         ) from None
+
+    try:
+        usage_repo.increment_message_count(db, owner_id)
+    except Exception:
+        logger.exception("Failed to increment message usage owner_id=%s", owner_id)
 
     return WidgetChatResponse(
         reply=out.reply,

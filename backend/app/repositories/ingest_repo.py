@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
+from typing import Any
+
+from app.db.database import db_execute, db_executemany
 
 logger = logging.getLogger(__name__)
 
 
-def delete_chunks_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> None:
-    logger.debug("delete_chunks_for_chatbot chatbot_id=%s", chatbot_id)
-    conn.execute("DELETE FROM ingest_chunks WHERE chatbot_id = ?", (chatbot_id,))
+def delete_chunks_for_chatbot(conn: Any, chatbot_id: int) -> None:
+    db_execute(conn, "DELETE FROM ingest_chunks WHERE chatbot_id = %s", (chatbot_id,))
 
 
-def max_chunk_index(conn: sqlite3.Connection, chatbot_id: int) -> int:
-    cur = conn.execute(
-        "SELECT COALESCE(MAX(chunk_index), -1) AS m FROM ingest_chunks WHERE chatbot_id = ?",
+def max_chunk_index(conn: Any, chatbot_id: int) -> int:
+    cur = db_execute(
+        conn,
+        "SELECT COALESCE(MAX(chunk_index), -1) AS m FROM ingest_chunks WHERE chatbot_id = %s",
         (chatbot_id,),
     )
     row = cur.fetchone()
@@ -21,21 +23,19 @@ def max_chunk_index(conn: sqlite3.Connection, chatbot_id: int) -> int:
 
 
 def insert_chunks(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     rows: list[tuple[str, int, str]],
 ) -> int:
-    """
-    rows: (source_url, chunk_index, content)
-    """
     if not rows:
         return 0
-    logger.debug("insert_chunks chatbot_id=%s count=%s", chatbot_id, len(rows))
-    conn.executemany(
+    params = [(chatbot_id, url, i, content) for url, i, content in rows]
+    db_executemany(
+        conn,
         """
         INSERT INTO ingest_chunks (chatbot_id, source_url, chunk_index, content)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
         """,
-        [(chatbot_id, url, i, content) for url, i, content in rows],
+        params,
     )
     return len(rows)

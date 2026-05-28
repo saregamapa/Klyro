@@ -1,39 +1,37 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
 from typing import Any
 
-from app.db.database import rows_to_dicts
+from app.db.database import db_execute, insert_returning_id, rows_to_dicts
 
 logger = logging.getLogger(__name__)
 
 
 def save_conversation(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     user_message: str,
     bot_response: str,
     *,
     session_id: str | None = None,
 ) -> int:
-    logger.debug("save_conversation chatbot_id=%s session_id=%s", chatbot_id, session_id)
     sid = (session_id or "").strip()
-    cur = conn.execute(
+    return insert_returning_id(
+        conn,
         """
         INSERT INTO conversations (chatbot_id, session_id, user_message, bot_response)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
+        RETURNING id
         """,
         (chatbot_id, sid, user_message, bot_response),
     )
-    new_id = int(cur.lastrowid)
-    logger.info("Saved conversation id=%s chatbot_id=%s", new_id, chatbot_id)
-    return new_id
 
 
-def count_conversations_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> int:
-    cur = conn.execute(
-        "SELECT COUNT(*) AS c FROM conversations WHERE chatbot_id = ?",
+def count_conversations_for_chatbot(conn: Any, chatbot_id: int) -> int:
+    cur = db_execute(
+        conn,
+        "SELECT COUNT(*) AS c FROM conversations WHERE chatbot_id = %s",
         (chatbot_id,),
     )
     row = cur.fetchone()
@@ -41,23 +39,20 @@ def count_conversations_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -
 
 
 def top_questions_for_chatbot(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     *,
     limit: int = 15,
 ) -> list[tuple[str, int]]:
-    """
-    Group by normalized (lower + trim) user_message; return (representative question, count).
-    Representative is MIN(user_message) for stable ordering.
-    """
-    cur = conn.execute(
+    cur = db_execute(
+        conn,
         """
         SELECT MIN(user_message) AS question, COUNT(*) AS cnt
         FROM conversations
-        WHERE chatbot_id = ?
+        WHERE chatbot_id = %s
         GROUP BY LOWER(TRIM(user_message))
         ORDER BY cnt DESC, question ASC
-        LIMIT ?
+        LIMIT %s
         """,
         (chatbot_id, limit),
     )
@@ -65,25 +60,23 @@ def top_questions_for_chatbot(
 
 
 def get_session_history(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     session_id: str,
     *,
     limit: int = 10,
 ) -> list[dict[str, str]]:
-    """
-    Return the last `limit` exchanges for a session as OpenAI-style role/content dicts.
-    """
     sid = session_id.strip()
     if not sid:
         return []
-    cur = conn.execute(
+    cur = db_execute(
+        conn,
         """
         SELECT user_message, bot_response
         FROM conversations
-        WHERE chatbot_id = ? AND session_id = ?
+        WHERE chatbot_id = %s AND session_id = %s
         ORDER BY id DESC
-        LIMIT ?
+        LIMIT %s
         """,
         (chatbot_id, sid, limit),
     )
@@ -95,19 +88,20 @@ def get_session_history(
     return messages
 
 
-def stats_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> dict[str, object]:
-    cur = conn.execute(
+def stats_for_chatbot(conn: Any, chatbot_id: int) -> dict[str, object]:
+    cur = db_execute(
+        conn,
         """
         SELECT
             COUNT(*) AS total_exchanges,
             COUNT(DISTINCT CASE
                 WHEN session_id IS NOT NULL AND TRIM(session_id) != ''
                 THEN session_id
-                ELSE 'row-' || id
+                ELSE 'row-' || CAST(id AS TEXT)
             END) AS total_conversations,
             MAX(created_at) AS last_activity
         FROM conversations
-        WHERE chatbot_id = ?
+        WHERE chatbot_id = %s
         """,
         (chatbot_id,),
     )
@@ -121,20 +115,20 @@ def stats_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> dict[str, ob
 
 
 def get_conversations_by_chatbot(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     *,
     limit: int = 50,
     offset: int = 0,
 ) -> list[dict[str, Any]]:
-    logger.debug("get_conversations_by_chatbot chatbot_id=%s limit=%s offset=%s", chatbot_id, limit, offset)
-    cur = conn.execute(
+    cur = db_execute(
+        conn,
         """
         SELECT id, chatbot_id, session_id, user_message, bot_response, created_at
         FROM conversations
-        WHERE chatbot_id = ?
+        WHERE chatbot_id = %s
         ORDER BY id ASC
-        LIMIT ? OFFSET ?
+        LIMIT %s OFFSET %s
         """,
         (chatbot_id, limit, offset),
     )

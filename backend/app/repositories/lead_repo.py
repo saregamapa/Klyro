@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
 from typing import Any
 
-from app.db.database import rows_to_dicts
+from app.db.database import db_execute, insert_returning_id, rows_to_dicts
 
 logger = logging.getLogger(__name__)
 
 
 def create_lead(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     name: str | None,
     email: str | None,
@@ -18,33 +17,32 @@ def create_lead(
     *,
     phone: str | None = None,
 ) -> int:
-    logger.debug("create_lead chatbot_id=%s", chatbot_id)
-    cur = conn.execute(
+    return insert_returning_id(
+        conn,
         """
         INSERT INTO leads (chatbot_id, name, email, message, phone)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING id
         """,
         (chatbot_id, name, email, message, phone),
     )
-    new_id = int(cur.lastrowid)
-    logger.info("Created lead id=%s chatbot_id=%s", new_id, chatbot_id)
-    return new_id
 
 
 def list_leads_for_chatbot(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     *,
     limit: int = 50,
     offset: int = 0,
 ) -> list[dict[str, Any]]:
-    cur = conn.execute(
+    cur = db_execute(
+        conn,
         """
-        SELECT id, chatbot_id, name, email, message
+        SELECT id, chatbot_id, name, email, message, phone, created_at
         FROM leads
-        WHERE chatbot_id = ?
+        WHERE chatbot_id = %s
         ORDER BY id DESC
-        LIMIT ? OFFSET ?
+        LIMIT %s OFFSET %s
         """,
         (chatbot_id, limit, offset),
     )
@@ -52,19 +50,19 @@ def list_leads_for_chatbot(
 
 
 def upsert_lead_email(
-    conn: sqlite3.Connection,
+    conn: Any,
     chatbot_id: int,
     email: str,
     *,
     name: str | None = None,
     phone: str | None = None,
 ) -> int:
-    """Create a lead or update name/phone if the same email already exists for this bot."""
     em = email.strip().lower()
-    cur = conn.execute(
+    cur = db_execute(
+        conn,
         """
         SELECT id FROM leads
-        WHERE chatbot_id = ? AND LOWER(TRIM(email)) = ?
+        WHERE chatbot_id = %s AND LOWER(TRIM(email)) = %s
         ORDER BY id DESC LIMIT 1
         """,
         (chatbot_id, em),
@@ -73,12 +71,13 @@ def upsert_lead_email(
     if existing:
         lead_id = int(existing["id"])
         if name or phone:
-            conn.execute(
+            db_execute(
+                conn,
                 """
                 UPDATE leads
-                SET name = COALESCE(?, name),
-                    phone = COALESCE(?, phone)
-                WHERE id = ?
+                SET name = COALESCE(%s, name),
+                    phone = COALESCE(%s, phone)
+                WHERE id = %s
                 """,
                 (name, phone, lead_id),
             )
@@ -86,9 +85,10 @@ def upsert_lead_email(
     return create_lead(conn, chatbot_id, name, em, None)
 
 
-def count_leads_for_chatbot(conn: sqlite3.Connection, chatbot_id: int) -> int:
-    cur = conn.execute(
-        "SELECT COUNT(*) AS c FROM leads WHERE chatbot_id = ?",
+def count_leads_for_chatbot(conn: Any, chatbot_id: int) -> int:
+    cur = db_execute(
+        conn,
+        "SELECT COUNT(*) AS c FROM leads WHERE chatbot_id = %s",
         (chatbot_id,),
     )
     row = cur.fetchone()

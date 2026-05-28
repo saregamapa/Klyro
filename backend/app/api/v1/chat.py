@@ -5,7 +5,8 @@ import logging
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.chatbot_access import require_owned_chatbot
-from app.api.deps import CurrentUser, DbConn
+from app.api.deps import CurrentUser, DbConn, MessageQuotaOk
+from app.repositories import usage_repo
 from app.schemas.chat_api import ChatRequest, ChatResponse, ChatSource
 from app.services.rag_chat import run_rag_chat
 
@@ -19,6 +20,7 @@ def chat_rag(
     body: ChatRequest,
     db: DbConn,
     current_user: CurrentUser,
+    _quota: MessageQuotaOk,
 ) -> ChatResponse:
     require_owned_chatbot(db, body.chatbot_id, current_user.id)
 
@@ -42,6 +44,11 @@ def chat_rag(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Chat completion failed",
         ) from None
+
+    try:
+        usage_repo.increment_message_count(db, current_user.id)
+    except Exception:
+        logger.exception("Failed to increment message usage user_id=%s", current_user.id)
 
     sources = [
         ChatSource(

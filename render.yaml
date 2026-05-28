@@ -14,17 +14,29 @@ services:
         generateValue: true
       - key: OPENAI_API_KEY
         sync: false
-      - key: DATABASE_PATH
-        value: /app/data/database.db
-      - key: FRONTEND_STATIC_DIR
-        value: ../frontend/static
-      - key: FRONTEND_TEMPLATES_DIR
-        value: ../frontend/templates
+      - key: DATABASE_URL
+        fromDatabase:
+          name: klyro-db
+          property: connectionString
+      - key: VECTOR_BACKEND
+        value: pgvector
       - key: CORS_ALLOW_ORIGINS
         value: "*"
-      - key: VECTOR_BACKEND
-        value: sqlite
-    disk:
-      name: klyro-data
-      mountPath: /app/data
-      sizeGB: 1
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_STARTER
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: STRIPE_PRICE_AGENCY
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+
+databases:
+  - name: klyro-db
+    plan: starter
+    databaseName: klyro
+    user: klyro

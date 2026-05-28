@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
 
 from fastapi import APIRouter, HTTPException, Request, status
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 from app.api.deps import DbConn
+from app.core.rate_limit import limiter
+from app.db.database import is_integrity_error
+from app.repositories import billing_repo, user_repo
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -15,13 +15,11 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
-from app.repositories import user_repo
 from app.schemas.auth import LoginRequest, RefreshRequest, SignupRequest, TokenResponse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["auth"])
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
@@ -30,7 +28,10 @@ def signup(request: Request, body: SignupRequest, db: DbConn) -> dict:
     password_hash = hash_password(body.password)
     try:
         new_id = user_repo.create_user(db, body.email, password_hash)
-    except sqlite3.IntegrityError:
+        billing_repo.ensure_free_subscription(db, new_id)
+    except Exception as e:
+        if not is_integrity_error(e):
+            raise
         logger.info("Signup conflict for email=%s", body.email)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -48,6 +49,7 @@ def login(request: Request, body: LoginRequest, db: DbConn) -> TokenResponse:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
         )
+    billing_repo.ensure_free_subscription(db, user["id"])
     access_token = create_access_token(user_id=user["id"], email=user["email"])
     refresh_token = create_refresh_token(user_id=user["id"], email=user["email"])
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)

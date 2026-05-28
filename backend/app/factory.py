@@ -8,9 +8,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+
+from app.core.rate_limit import limiter
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
@@ -57,8 +57,6 @@ def create_app() -> FastAPI:
         openapi_url="/api/openapi.json" if settings.debug else None,
     )
 
-    # Configure rate limiter
-    limiter = Limiter(key_func=get_remote_address)
     app.state.limiter = limiter
 
     # Add rate limit exception handler
@@ -138,6 +136,16 @@ def create_app() -> FastAPI:
     @app.get("/signup")
     async def signup_page(request: Request):
         return _html("signup.html", request, page_title="Sign up")
+
+    @app.get("/billing")
+    async def billing_page(request: Request):
+        return _html(
+            "billing.html",
+            request,
+            page_title="Billing",
+            hide_nav=True,
+            hide_footer=True,
+        )
 
     @app.get("/dashboard")
     async def dashboard_page(request: Request):
