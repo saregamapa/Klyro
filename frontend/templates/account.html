@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Account{% endblock %}
+{% block content %}
+<div class="flex min-h-screen bg-slate-950">
+  <aside class="fixed bottom-0 left-0 top-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-slate-950/95 backdrop-blur-xl lg:flex">
+    <div class="border-b border-white/5 p-4">
+      <a href="/" class="flex items-center gap-2 font-semibold text-white transition hover:text-emerald-300">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-emerald-600 text-xs font-bold text-slate-950">K</span>
+        Klyro
+      </a>
+    </div>
+    <nav class="flex flex-1 flex-col gap-1 p-4">
+      <a href="/dashboard" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"><span>🤖</span> Chatbots</a>
+      <a href="/dashboard/analytics" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"><span>📈</span> Analytics</a>
+      <a href="/billing" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"><span>💳</span> Billing</a>
+      <a href="/account" class="flex items-center gap-3 rounded-xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-400"><span>👤</span> Account</a>
+    </nav>
+    <div class="border-t border-white/5 p-4">
+      <button type="button" id="logout-btn" class="w-full rounded-xl border border-slate-700 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800">Log out</button>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex-col pt-0 lg:pl-64">
+    <header class="sticky top-0 z-30 flex items-center border-b border-white/5 bg-slate-950/80 px-4 py-5 backdrop-blur-xl sm:px-8">
+      <div>
+        <h1 class="text-xl font-bold text-white">Account settings</h1>
+        <p class="text-sm text-slate-500">Manage your profile, security, and data.</p>
+      </div>
+    </header>
+
+    <div class="max-w-2xl space-y-8 px-4 py-8 sm:px-8">
+
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <h2 class="text-base font-semibold text-white">Profile</h2>
+        <p class="mt-1 text-sm text-slate-400">Your account email. Contact support to change it.</p>
+        <p id="account-email" class="mt-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-slate-400">Loading…</p>
+      </section>
+
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <h2 class="text-base font-semibold text-white">Change password</h2>
+        <p class="mt-1 text-sm text-slate-400">You'll be logged out of all other devices.</p>
+        <form id="change-password-form" class="mt-4 space-y-3">
+          <input id="current-password" type="password" placeholder="Current password"
+            class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          <input id="new-password" type="password" placeholder="New password (min 8 chars, 1 uppercase, 1 digit)"
+            class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          <input id="confirm-password" type="password" placeholder="Confirm new password"
+            class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          <button type="submit" id="change-password-btn"
+            class="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500">
+            Update password
+          </button>
+        </form>
+      </section>
+
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <h2 class="text-base font-semibold text-white">Your data</h2>
+        <p class="mt-1 text-sm text-slate-400">Download a copy of everything Klyro holds about you.</p>
+        <button type="button" id="export-data-btn"
+          class="mt-4 rounded-xl border border-slate-700 px-5 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800">
+          Export data (JSON)
+        </button>
+      </section>
+
+      <section class="rounded-2xl border border-red-900/40 bg-red-950/20 p-6">
+        <h2 class="text-base font-semibold text-red-300">Danger zone</h2>
+        <p class="mt-1 text-sm text-red-400/80">Permanently delete your account, all chatbots, and all data. This cannot be undone.</p>
+        <button type="button" id="delete-account-btn"
+          class="mt-4 rounded-xl border border-red-500/40 bg-red-950/60 px-5 py-2.5 text-sm font-medium text-red-200 transition hover:border-red-400/60 hover:bg-red-900/80">
+          Delete account
+        </button>
+      </section>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var TOKEN = localStorage.getItem("klyro_token");
+  if (!TOKEN) { window.location.href = "/login"; return; }
+
+  var H = { "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" };
+
+  fetch("/api/v1/users/me", { headers: H })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var el = document.getElementById("account-email");
+      if (el) el.textContent = d.email || "—";
+    });
+
+  var logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) logoutBtn.addEventListener("click", function () {
+    var ref = localStorage.getItem("klyro_refresh_token");
+    fetch("/api/v1/logout", { method: "POST", headers: H,
+      body: JSON.stringify({ refresh_token: ref }) })
+      .finally(function () {
+        localStorage.removeItem("klyro_token");
+        localStorage.removeItem("klyro_refresh_token");
+        window.location.href = "/";
+      });
+  });
+
+  var cpForm = document.getElementById("change-password-form");
+  if (cpForm) cpForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var cur = document.getElementById("current-password").value;
+    var nw = document.getElementById("new-password").value;
+    var conf = document.getElementById("confirm-password").value;
+    if (nw !== conf) { alert("New passwords don't match"); return; }
+    var r = await fetch("/api/v1/users/me/password", {
+      method: "PATCH", headers: H,
+      body: JSON.stringify({ current_password: cur, new_password: nw }),
+    });
+    if (r.ok) {
+      alert("Password updated. Please log in again.");
+      localStorage.removeItem("klyro_token");
+      localStorage.removeItem("klyro_refresh_token");
+      window.location.href = "/login";
+    } else {
+      var d = await r.json();
+      alert(d.detail || "Failed to update password");
+    }
+  });
+
+  var exportBtn = document.getElementById("export-data-btn");
+  if (exportBtn) exportBtn.addEventListener("click", async function () {
+    var r = await fetch("/api/v1/users/me/export", { headers: H });
+    if (!r.ok) { alert("Export failed"); return; }
+    var blob = await r.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "klyro-export.json"; a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  var delBtn = document.getElementById("delete-account-btn");
+  if (delBtn) delBtn.addEventListener("click", async function () {
+    if (!confirm("Permanently delete your account and ALL data? This cannot be undone.")) return;
+    if (!confirm("Are you absolutely sure?")) return;
+    var r = await fetch("/api/v1/users/me", { method: "DELETE", headers: H });
+    if (r.ok || r.status === 204) {
+      localStorage.removeItem("klyro_token");
+      localStorage.removeItem("klyro_refresh_token");
+      alert("Account deleted.");
+      window.location.href = "/";
+    } else {
+      var d = await r.json();
+      alert(d.detail || "Deletion failed");
+    }
+  });
+});
+</script>
+{% endblock %}

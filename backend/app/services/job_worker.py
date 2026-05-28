@@ -3,10 +3,119 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time as _time
 
 logger = logging.getLogger(__name__)
 
 _POLL_INTERVAL_SECONDS = 2
+_last_cleanup: float = 0.0
+_CLEANUP_INTERVAL_SECONDS = 3600
+
+
+def _should_run_cleanup() -> bool:
+    global _last_cleanup
+    now = _time.monotonic()
+    if now - _last_cleanup > _CLEANUP_INTERVAL_SECONDS:
+        _last_cleanup = now
+        return True
+    return False
+
+
+def _run_cleanup() -> None:
+    """
+    Housekeeping tasks run hourly:
+    1. Delete expired refresh_tokens (already past expires_at)
+    2. Delete expired password_reset_tokens
+    3. Enforce per-plan conversation retention (free=7d, starter=90d)
+    """
+    from app.core.config import settings
+    from app.db.database import db_execute, get_db_connection
+
+    conn = get_db_connection()
+    try:
+        db_execute(
+            conn,
+            "DELETE FROM refresh_tokens WHERE expires_at < NOW()",
+            (),
+        )
+        db_execute(
+            conn,
+            "DELETE FROM password_reset_tokens WHERE expires_at < NOW()",
+            (),
+        )
+
+        if settings.use_postgres:
+            db_execute(
+                conn,
+                """
+                DELETE FROM conversations
+                WHERE created_at < NOW() - INTERVAL '7 days'
+                  AND chatbot_id IN (
+                      SELECT c.id FROM chatbots c
+                      JOIN subscriptions s ON s.user_id = c.user_id
+                      WHERE s.plan = 'free'
+                  )
+                """,
+                (),
+            )
+            db_execute(
+                conn,
+                """
+                DELETE FROM conversations
+                WHERE created_at < NOW() - INTERVAL '90 days'
+                  AND chatbot_id IN (
+                      SELECT c.id FROM chatbots c
+                      JOIN subscriptions s ON s.user_id = c.user_id
+                      WHERE s.plan = 'starter'
+                  )
+                """,
+                (),
+            )
+        else:
+            db_execute(
+                conn,
+                "DELETE FROM refresh_tokens WHERE expires_at < datetime('now')",
+                (),
+            )
+            db_execute(
+                conn,
+                "DELETE FROM password_reset_tokens WHERE expires_at < datetime('now')",
+                (),
+            )
+            db_execute(
+                conn,
+                """
+                DELETE FROM conversations
+                WHERE created_at < datetime('now', '-7 days')
+                  AND chatbot_id IN (
+                      SELECT c.id FROM chatbots c
+                      JOIN subscriptions s ON s.user_id = c.user_id
+                      WHERE s.plan = 'free'
+                  )
+                """,
+                (),
+            )
+            db_execute(
+                conn,
+                """
+                DELETE FROM conversations
+                WHERE created_at < datetime('now', '-90 days')
+                  AND chatbot_id IN (
+                      SELECT c.id FROM chatbots c
+                      JOIN subscriptions s ON s.user_id = c.user_id
+                      WHERE s.plan = 'starter'
+                  )
+                """,
+                (),
+            )
+
+        conn.commit()
+        logger.info("Cleanup complete")
+    except Exception:
+        logger.exception("Cleanup failed")
+        conn.rollback()
+    finally:
+        conn.close()
 
 
 async def run_worker_loop() -> None:
@@ -20,6 +129,8 @@ async def run_worker_loop() -> None:
         try:
             processed = await asyncio.to_thread(_process_next_job)
             if not processed:
+                if _should_run_cleanup():
+                    await asyncio.to_thread(_run_cleanup)
                 await asyncio.sleep(_POLL_INTERVAL_SECONDS)
         except Exception:
             logger.exception("Job worker error")

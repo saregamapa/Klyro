@@ -1,28 +1,180 @@
 {% extends "base.html" %}
 {% block title %}Billing{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-2xl px-4 py-16">
-  <h1 class="text-3xl font-bold text-white">Billing</h1>
-  <p class="mt-2 text-slate-400">Manage your Klyro subscription.</p>
+<div class="flex min-h-screen bg-slate-950">
+  <aside class="fixed bottom-0 left-0 top-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-slate-950/95 backdrop-blur-xl lg:flex">
+    <div class="border-b border-white/5 p-4">
+      <a href="/" class="flex items-center gap-2 font-semibold text-white transition hover:text-emerald-300">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-emerald-600 text-xs font-bold text-slate-950">K</span>
+        Klyro
+      </a>
+    </div>
+    <nav class="flex flex-1 flex-col gap-1 p-4">
+      <a href="/dashboard" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"><span>🤖</span> Chatbots</a>
+      <a href="/dashboard/analytics" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"><span>📈</span> Analytics</a>
+      <a href="/billing" class="flex items-center gap-3 rounded-xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-400"><span>💳</span> Billing</a>
+      <a href="/account" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition hover:bg-slate-800/50 hover:text-white"><span>👤</span> Account</a>
+    </nav>
+    <div class="border-t border-white/5 p-4">
+      <button type="button" id="logout-btn" class="w-full rounded-xl border border-slate-700 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800">Log out</button>
+    </div>
+  </aside>
 
-  <div id="billing-loading" class="mt-8 text-slate-500">Loading…</div>
-  <div id="billing-panel" class="cs-glass mt-8 hidden rounded-2xl p-6">
-    <p class="text-sm text-slate-500">Current plan</p>
-    <p id="billing-plan" class="mt-1 text-2xl font-semibold capitalize text-white">—</p>
-    <p id="billing-status" class="mt-1 text-sm text-slate-400"></p>
-    <p id="billing-usage" class="mt-4 text-sm text-slate-300"></p>
-    <div class="mt-6 flex flex-wrap gap-3">
-      <a href="/pricing" class="rounded-xl border border-slate-600 px-4 py-2 text-sm text-white hover:bg-slate-800">View plans</a>
-      <button type="button" id="billing-portal-btn" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500">Manage subscription</button>
+  <div class="flex-1 lg:pl-64">
+    <header class="sticky top-0 z-30 flex items-center border-b border-white/5 bg-slate-950/80 px-4 py-5 backdrop-blur-xl sm:px-8">
+      <div>
+        <h1 class="text-xl font-bold text-white">Billing</h1>
+        <p class="text-sm text-slate-500">Manage your Klyro subscription and usage.</p>
+      </div>
+    </header>
+
+    <div class="max-w-3xl space-y-6 px-4 py-8 sm:px-8">
+
+      <div id="billing-loading" class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <div class="cs-skeleton h-5 w-24 rounded"></div>
+        <div class="cs-skeleton mt-4 h-8 w-32 rounded"></div>
+        <div class="cs-skeleton mt-6 h-3 w-full rounded"></div>
+        <div class="cs-skeleton mt-2 h-3 w-3/4 rounded"></div>
+      </div>
+
+      <div id="billing-panel" class="hidden space-y-6">
+        <div class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-widest text-slate-500">Current plan</p>
+              <p id="billing-plan-name" class="mt-1 text-3xl font-bold capitalize text-white">—</p>
+              <p id="billing-plan-status" class="mt-1 text-sm text-slate-400"></p>
+              <p id="billing-renewal" class="mt-1 text-xs text-slate-600"></p>
+            </div>
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <a href="/pricing"
+                 class="rounded-xl border border-slate-700 px-4 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800 text-center">
+                View plans
+              </a>
+              <button type="button" id="billing-portal-btn"
+                class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500">
+                Manage subscription
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+          <p class="text-xs font-semibold uppercase tracking-widest text-slate-500">Usage this month</p>
+          <div class="mt-4 space-y-4">
+            <div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-300">Messages</span>
+                <span id="msg-usage-text" class="text-slate-500">— / —</span>
+              </div>
+              <div class="mt-2 h-2 rounded-full bg-slate-800">
+                <div id="msg-usage-bar"
+                     class="h-2 rounded-full bg-emerald-500 transition-all duration-500"
+                     style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-300">Chatbots</span>
+                <span id="bot-usage-text" class="text-slate-500">— / —</span>
+              </div>
+              <div class="mt-2 h-2 rounded-full bg-slate-800">
+                <div id="bot-usage-bar"
+                     class="h-2 rounded-full bg-indigo-500 transition-all duration-500"
+                     style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          <p id="usage-upgrade-hint" class="mt-4 hidden text-xs text-amber-400">
+            ⚠ You're close to your plan limits.
+            <a href="/pricing" class="underline hover:text-amber-300">Upgrade now</a>
+          </p>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="/static/js/billing.js"></script>
+<script src="/static/js/dashboard.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.KlyroBilling) window.KlyroBilling.initAccountPage();
+document.addEventListener("DOMContentLoaded", function () {
+  var TOKEN = localStorage.getItem("klyro_token");
+  if (!TOKEN) { window.location.href = "/login"; return; }
+  var H = { "Authorization": "Bearer " + TOKEN };
+
+  var lb = document.getElementById("logout-btn");
+  if (lb) lb.addEventListener("click", function () {
+    var ref = localStorage.getItem("klyro_refresh_token");
+    fetch("/api/v1/logout", { method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, H),
+      body: JSON.stringify({ refresh_token: ref }) })
+      .finally(function () {
+        localStorage.removeItem("klyro_token");
+        localStorage.removeItem("klyro_refresh_token");
+        window.location.href = "/";
+      });
   });
+
+  var pb = document.getElementById("billing-portal-btn");
+  if (pb) pb.addEventListener("click", async function () {
+    pb.disabled = true; pb.textContent = "Opening…";
+    var r = await fetch("/api/v1/billing/portal", { method: "POST", headers: H });
+    var d = await r.json().catch(function () { return {}; });
+    if (d.portal_url) { window.location.href = d.portal_url; }
+    else { alert(d.detail || "Could not open billing portal"); pb.disabled = false; pb.textContent = "Manage subscription"; }
+  });
+
+  Promise.all([
+    fetch("/api/v1/billing/subscription", { headers: H }).then(function (r) { return r.json(); }),
+    fetch("/api/v1/billing/usage", { headers: H }).then(function (r) { return r.json(); }),
+  ]).then(function (results) {
+    var sub = results[0], usage = results[1];
+    document.getElementById("billing-loading").classList.add("hidden");
+    document.getElementById("billing-panel").classList.remove("hidden");
+
+    var planEl = document.getElementById("billing-plan-name");
+    if (planEl) planEl.textContent = sub.plan || "Free";
+
+    var statusEl = document.getElementById("billing-plan-status");
+    if (statusEl) {
+      var statusMap = { active: "Active", trialing: "Trial active", past_due: "Payment past due", canceled: "Canceled" };
+      statusEl.textContent = statusMap[sub.status] || sub.status || "";
+      if (sub.status === "past_due") statusEl.className = "mt-1 text-sm text-amber-400";
+    }
+
+    var renewalEl = document.getElementById("billing-renewal");
+    if (renewalEl && sub.current_period_end) {
+      renewalEl.textContent = "Renews " + new Date(sub.current_period_end).toLocaleDateString();
+    }
+
+    var msgUsed = usage.messages_used || 0;
+    var msgLimit = usage.messages_limit || 0;
+    var msgPct = msgLimit > 0 ? Math.min(100, Math.round(msgUsed / msgLimit * 100)) : 0;
+    var msgText = document.getElementById("msg-usage-text");
+    var msgBar = document.getElementById("msg-usage-bar");
+    if (msgText) msgText.textContent = msgLimit < 0 ? msgUsed + " / Unlimited" : msgUsed.toLocaleString() + " / " + msgLimit.toLocaleString();
+    if (msgBar) {
+      msgBar.style.width = msgPct + "%";
+      if (msgPct > 80) msgBar.className = "h-2 rounded-full bg-amber-500 transition-all duration-500";
+    }
+
+    var botUsed = usage.chatbots_used || 0;
+    var botLimit = usage.chatbots_limit || 0;
+    var botPct = botLimit > 0 ? Math.min(100, Math.round(botUsed / botLimit * 100)) : 0;
+    var botText = document.getElementById("bot-usage-text");
+    var botBar = document.getElementById("bot-usage-bar");
+    if (botText) botText.textContent = botLimit < 0 ? botUsed + " / Unlimited" : botUsed + " / " + botLimit;
+    if (botBar) botBar.style.width = botPct + "%";
+
+    if ((msgPct > 80 || botPct > 80) && sub.plan !== "enterprise") {
+      var hint = document.getElementById("usage-upgrade-hint");
+      if (hint) hint.classList.remove("hidden");
+    }
+  }).catch(function () {
+    document.getElementById("billing-loading").textContent = "Failed to load billing info.";
+  });
+});
 </script>
 {% endblock %}

@@ -319,25 +319,116 @@
       "bot"
     );
 
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      var text = (input.value || "").trim();
-      if (!text) return;
+    function createBotBubble() {
+      var wrap = document.createElement("div");
+      wrap.className = "mr-8 flex justify-start";
+      var bubble = document.createElement("div");
+      bubble.className =
+        "max-w-[95%] rounded-2xl rounded-bl-md border border-slate-100 bg-slate-50 px-3 py-2 text-slate-800";
+      bubble.innerHTML = "▍";
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return bubble;
+    }
 
-      showError("");
-      appendBubble(text, "user");
-      input.value = "";
-      sendBtn.disabled = true;
-      input.disabled = true;
-      appendTypingIndicator();
+    function fillBotBubble(bubble, text) {
+      if (!bubble) return;
+      bubble.innerHTML = renderMarkdown(text).replace(/\n/g, "<br/>");
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
 
+    function setInputEnabled(enabled) {
+      sendBtn.disabled = !enabled;
+      input.disabled = !enabled;
+    }
+
+    function showLeadPrompt(promptText) {
+      maybeShowLeadForm({ show_lead_form: true, lead_prompt: promptText });
+    }
+
+    async function _sendStreaming(userText, botBubble) {
+      var accumulated = "";
+      try {
+        var res = await fetch(API_ORIGIN + "/api/v1/widget/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatbot_id: BOT_ID,
+            message: userText,
+            session_id: SESSION_ID,
+          }),
+          signal: AbortSignal.timeout(90000),
+        });
+
+        if (!res.ok) {
+          if (res.status === 403) {
+            fillBotBubble(
+              botBubble,
+              "This chatbot is not configured for this domain. Contact the site owner to resolve this."
+            );
+          } else if (res.status === 429) {
+            fillBotBubble(botBubble, "This chatbot has reached its monthly message limit.");
+          } else {
+            var errData = await res.json().catch(function () {
+              return {};
+            });
+            fillBotBubble(botBubble, formatApiError(errData) || "An error occurred. Please try again.");
+          }
+          return;
+        }
+
+        var reader = res.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+
+        while (true) {
+          var chunk = await reader.read();
+          if (chunk.done) break;
+
+          buffer += decoder.decode(chunk.value, { stream: true });
+          var lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
+
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            if (!line.startsWith("data: ")) continue;
+            try {
+              var data = JSON.parse(line.slice(6));
+              if (data.text) {
+                accumulated += data.text;
+                fillBotBubble(botBubble, accumulated);
+              }
+              if (data.error) {
+                fillBotBubble(botBubble, "Sorry, something went wrong. Please try again.");
+              }
+              if (data.done && data.show_lead_form) {
+                showLeadPrompt(data.lead_prompt);
+              }
+            } catch (_) {}
+          }
+        }
+
+        if (!accumulated) {
+          fillBotBubble(botBubble, "(no response — try asking again)");
+        }
+      } catch (err) {
+        if (err.name === "TimeoutError" || err.name === "AbortError") {
+          fillBotBubble(botBubble, "Response timed out. Please try again.");
+        } else {
+          fillBotBubble(botBubble, "Connection error. Please try again.");
+        }
+      }
+    }
+
+    async function _sendNonStreaming(userText, botBubble) {
       try {
         var res = await fetch(API_ORIGIN + "/api/v1/widget/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chatbot_id: BOT_ID,
-            message: text,
+            message: userText,
             session_id: SESSION_ID,
           }),
         });
@@ -346,35 +437,44 @@
         });
         if (!res.ok) {
           if (res.status === 403) {
-            removeTypingIndicator();
-            appendBubble(
-              "This chatbot is not configured for this domain. " +
-                "Contact the site owner to resolve this.",
-              "bot"
+            fillBotBubble(
+              botBubble,
+              "This chatbot is not configured for this domain. Contact the site owner to resolve this."
             );
             return;
           }
-          throw new Error(formatApiError(data) || res.statusText);
+          fillBotBubble(botBubble, formatApiError(data) || "An error occurred.");
+          return;
         }
-        if (!data.reply && data.reply !== "") {
-          throw new Error("Invalid response from server");
-        }
-        removeTypingIndicator();
-        appendBubble(data.reply, "bot");
-        maybeShowLeadForm(data);
-      } catch (err) {
-        removeTypingIndicator();
-        showError(err.message || "Something went wrong");
-        appendBubble(
-          "Sorry, I couldn’t get a response. Please try again.",
-          "bot"
-        );
-      } finally {
-        sendBtn.disabled = false;
-        input.disabled = false;
-        input.focus();
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+        fillBotBubble(botBubble, data.reply || "(no response)");
+        if (data.show_lead_form) showLeadPrompt(data.lead_prompt);
+      } catch (_) {
+        fillBotBubble(botBubble, "Connection error. Please try again.");
       }
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var text = (input.value || "").trim();
+      if (!text) return;
+
+      showError("");
+      appendBubble(text, "user");
+      input.value = "";
+      setInputEnabled(false);
+
+      var botBubble = createBotBubble();
+      var supportsStreaming = typeof ReadableStream !== "undefined";
+
+      if (supportsStreaming) {
+        await _sendStreaming(text, botBubble);
+      } else {
+        await _sendNonStreaming(text, botBubble);
+      }
+
+      setInputEnabled(true);
+      input.focus();
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     });
   }
 })();

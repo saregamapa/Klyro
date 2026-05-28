@@ -181,6 +181,16 @@ def create_app() -> FastAPI:
             hide_footer=True,
         )
 
+    @app.get("/account")
+    async def account_page(request: Request):
+        return _html(
+            "account.html",
+            request,
+            page_title="Account",
+            hide_nav=True,
+            hide_footer=True,
+        )
+
     @app.get("/dashboard")
     async def dashboard_page(request: Request):
         return _html(
@@ -221,5 +231,37 @@ def create_app() -> FastAPI:
             hide_nav=True,
             hide_footer=True,
         )
+
+    @app.get("/robots.txt", include_in_schema=False)
+    async def robots_txt() -> PlainTextResponse:
+        content = (
+            "User-agent: *\n"
+            "Allow: /\n"
+            "Disallow: /dashboard\n"
+            "Disallow: /billing\n"
+            "Disallow: /account\n"
+            "Disallow: /chatbot/\n"
+            "Disallow: /api/\n"
+            f"\nSitemap: {settings.app_base_url}/sitemap.xml\n"
+        )
+        return PlainTextResponse(content, media_type="text/plain")
+
+    @app.get("/sitemap.xml", include_in_schema=False)
+    async def sitemap_xml() -> PlainTextResponse:
+        public_paths = ["/", "/pricing", "/login", "/signup", "/forgot-password"]
+        lines = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ]
+        for path in public_paths:
+            lines.append(
+                f"  <url>\n"
+                f"    <loc>{settings.app_base_url}{path}</loc>\n"
+                f"    <changefreq>weekly</changefreq>\n"
+                f"    <priority>{'1.0' if path == '/' else '0.7'}</priority>\n"
+                f"  </url>"
+            )
+        lines.append("</urlset>")
+        return PlainTextResponse("\n".join(lines), media_type="application/xml")
 
     return app

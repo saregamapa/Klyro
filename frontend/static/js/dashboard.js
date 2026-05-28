@@ -110,9 +110,24 @@
         });
       }
       var logout = document.getElementById("logout-btn");
-      function doLogout() {
+      async function doLogout() {
+        var ref = localStorage.getItem("klyro_refresh_token");
+        var tok = localStorage.getItem(TOKEN_KEY);
+        if (ref && tok) {
+          try {
+            await fetch("/api/v1/logout", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + tok,
+              },
+              body: JSON.stringify({ refresh_token: ref }),
+            });
+          } catch (_) {}
+        }
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(LEGACY_TOKEN_KEY);
+        localStorage.removeItem("klyro_refresh_token");
         window.location.href = "/";
       }
       if (logout) logout.addEventListener("click", doLogout);

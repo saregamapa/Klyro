@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
 from dataclasses import dataclass
+from typing import Any
 
 from openai import OpenAI
 
@@ -73,16 +73,29 @@ def _build_system_prompt(
     return "\n\n".join(parts)
 
 
-def run_rag_chat(
-    conn: sqlite3.Connection,
+@dataclass
+class RagContext:
+    """Everything needed to call the LLM — assembled synchronously."""
+
+    messages: list[dict]
+    chatbot_id: int
+    user_message: str
+    sid: str
+    want_lead: bool
+    chatbot: dict
+
+
+def prepare_rag_context(
+    conn: Any,
     chatbot_id: int,
     user_message: str,
     *,
     session_id: str | None = None,
     top_k: int | None = None,
-) -> RagChatOutcome:
+) -> RagContext:
     """
-    Retrieve top chunks, call OpenAI chat with grounded system prompt, save conversation.
+    Do all the DB/vector work synchronously and return a RagContext.
+    Does NOT call OpenAI chat — that happens in the streaming or non-streaming caller.
     """
     if not settings.openai_api_key.strip():
         raise RuntimeError("OPENAI_API_KEY is not configured")
@@ -100,41 +113,53 @@ def run_rag_chat(
     ids = [h.ingest_chunk_id for h in hits]
     meta = embedding_repo.get_chunks_content_map(conn, chatbot_id, ids)
 
-    chunk_hits: list[ChunkHit] = []
     context_blocks: list[str] = []
     for h in hits:
         row = meta.get(h.ingest_chunk_id)
-        if row is None:
-            continue
-        chunk_hits.append(
-            ChunkHit(
-                ingest_chunk_id=h.ingest_chunk_id,
-                score=h.score,
-                content=row["content"],
-                source_url=row["source_url"],
-                chunk_index=row["chunk_index"],
-            )
-        )
-        context_blocks.append(f"[Source: {row['source_url']}]\n{row['content']}")
+        if row:
+            context_blocks.append(f"[Source: {row['source_url']}]\n{row['content']}")
 
     system_prompt = _build_system_prompt(context_blocks, chatbot)
-    history: list[dict[str, str]] = []
     sid = (session_id or "").strip()
+    history: list[dict] = []
     if sid:
-        history = conversation_repo.get_session_history(
-            conn, chatbot_id, sid, limit=10
-        )
+        history = conversation_repo.get_session_history(conn, chatbot_id, sid, limit=10)
 
-    messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
+    messages: list[dict] = [{"role": "system", "content": system_prompt}]
     messages.extend(history)
     messages.append({"role": "user", "content": user_message})
+
+    return RagContext(
+        messages=messages,
+        chatbot_id=chatbot_id,
+        user_message=user_message,
+        sid=sid,
+        want_lead=should_prompt_lead_capture(user_message),
+        chatbot=chatbot,
+    )
+
+
+def run_rag_chat(
+    conn: Any,
+    chatbot_id: int,
+    user_message: str,
+    *,
+    session_id: str | None = None,
+    top_k: int | None = None,
+) -> RagChatOutcome:
+    """
+    Retrieve top chunks, call OpenAI chat with grounded system prompt, save conversation.
+    """
+    ctx = prepare_rag_context(
+        conn, chatbot_id, user_message, session_id=session_id, top_k=top_k
+    )
 
     client = OpenAI(api_key=settings.openai_api_key)
 
     try:
         completion = client.chat.completions.create(
             model=settings.openai_chat_model,
-            messages=messages,
+            messages=ctx.messages,
             temperature=0.2,
         )
     except Exception:
@@ -143,14 +168,13 @@ def run_rag_chat(
 
     reply = (completion.choices[0].message.content or "").strip()
     conv_id = conversation_repo.save_conversation(
-        conn, chatbot_id, user_message, reply, session_id=sid or None
+        conn, chatbot_id, user_message, reply, session_id=ctx.sid or None
     )
     logger.info("RAG chat saved conversation_id=%s chatbot_id=%s", conv_id, chatbot_id)
-    want_lead = should_prompt_lead_capture(user_message)
     return RagChatOutcome(
         reply=reply,
         conversation_id=conv_id,
-        chunk_hits=chunk_hits,
-        show_lead_form=want_lead,
-        lead_prompt=_DEFAULT_LEAD_PROMPT if want_lead else None,
+        chunk_hits=[],
+        show_lead_form=ctx.want_lead,
+        lead_prompt=_DEFAULT_LEAD_PROMPT if ctx.want_lead else None,
     )

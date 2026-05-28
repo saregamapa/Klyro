@@ -11,7 +11,17 @@ services:
       - key: DEBUG
         value: "false"
       - key: SECRET_KEY
-        generateValue: true
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: "Klyro <noreply@klyro.ai>"
+      - key: EMAIL_ENABLED
+        value: "true"
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "0.1"
       - key: OPENAI_API_KEY
         sync: false
       - key: DATABASE_URL
