@@ -55,6 +55,8 @@
   }
 
   function waitForJob(jobId, headers, statusMsg, setBar, pct) {
+    var bar = document.getElementById("train-bar");
+    if (bar) bar.classList.add("kly-bar-polling");
     return new Promise(function (resolve, reject) {
       pollJob(
         jobId,
@@ -62,8 +64,14 @@
         function (st) {
           if (setBar && statusMsg) setBar(pct, statusMsg + " (" + st + ")…");
         },
-        resolve,
-        reject
+        function (result) {
+          if (bar) bar.classList.remove("kly-bar-polling");
+          resolve(result);
+        },
+        function (err) {
+          if (bar) bar.classList.remove("kly-bar-polling");
+          reject(err);
+        }
       );
     });
   }

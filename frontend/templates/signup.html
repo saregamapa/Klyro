@@ -7,7 +7,7 @@
       <div class="text-center">
         <a href="/" class="inline-flex items-center gap-2 text-lg font-semibold text-white">
           <span
-            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-emerald-600 text-sm font-bold text-slate-950"
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-klyro-cyan via-klyro-violet to-klyro-pink text-sm font-bold text-white"
             >K</span
           >
           Klyro
@@ -41,6 +41,16 @@
             class="mt-1.5 w-full rounded-xl border border-slate-600/80 bg-slate-900/80 px-4 py-3 text-white outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/30"
             placeholder="At least 8 characters"
           />
+          <!-- Password strength indicator -->
+          <div id="pw-strength-bar" class="mt-2 hidden">
+            <div class="flex gap-1">
+              <div id="pw-s1" class="h-1 flex-1 rounded-full bg-slate-700 transition-colors duration-300"></div>
+              <div id="pw-s2" class="h-1 flex-1 rounded-full bg-slate-700 transition-colors duration-300"></div>
+              <div id="pw-s3" class="h-1 flex-1 rounded-full bg-slate-700 transition-colors duration-300"></div>
+              <div id="pw-s4" class="h-1 flex-1 rounded-full bg-slate-700 transition-colors duration-300"></div>
+            </div>
+            <p id="pw-strength-label" class="mt-1 text-xs text-slate-500"></p>
+          </div>
           <p id="password-err" class="mt-1 hidden text-xs text-red-400"></p>
         </div>
         <button
@@ -63,6 +73,42 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     if (window.CSAuth) window.CSAuth.initSignup();
+
+    // Password strength meter
+    var pwInput = document.getElementById("password");
+    var strengthBar = document.getElementById("pw-strength-bar");
+    var segs = [document.getElementById("pw-s1"), document.getElementById("pw-s2"), document.getElementById("pw-s3"), document.getElementById("pw-s4")];
+    var label = document.getElementById("pw-strength-label");
+    var levels = [
+      { color: "bg-red-500",    text: "Too short",  textColor: "text-red-400" },
+      { color: "bg-orange-500", text: "Weak",        textColor: "text-orange-400" },
+      { color: "bg-yellow-400", text: "Fair",        textColor: "text-yellow-400" },
+      { color: "bg-emerald-500",text: "Strong",      textColor: "text-emerald-400" },
+      { color: "bg-emerald-400",text: "Very strong", textColor: "text-emerald-300" }
+    ];
+    function scorePassword(pw) {
+      if (pw.length < 8) return 0;
+      var score = 1;
+      if (pw.length >= 12) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return Math.min(score, 4);
+    }
+    if (pwInput) {
+      pwInput.addEventListener("input", function () {
+        var val = pwInput.value;
+        if (!val) { strengthBar.classList.add("hidden"); return; }
+        strengthBar.classList.remove("hidden");
+        var score = scorePassword(val);
+        var lvl = levels[score];
+        segs.forEach(function (s, i) {
+          s.className = "h-1 flex-1 rounded-full transition-colors duration-300 " + (i < score ? lvl.color : "bg-slate-700");
+        });
+        label.textContent = lvl.text;
+        label.className = "mt-1 text-xs " + lvl.textColor;
+      });
+    }
   });
 </script>
 {% endblock %}

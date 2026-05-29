@@ -439,6 +439,23 @@ body {
   background: linear-gradient(90deg, var(--kly-cyan), var(--kly-violet));
   transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
 }
+/* Polling shimmer — applied while a job is being polled */
+.kly-bar-polling {
+  position: relative;
+  overflow: hidden;
+}
+.kly-bar-polling::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: kly-bar-sweep 1.4s ease-in-out infinite;
+}
+@keyframes kly-bar-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

@@ -1,52 +1,89 @@
 {% extends "base.html" %}
 {% block title %}Pricing{% endblock %}
+{% block meta_description %}Simple, transparent pricing for Klyro AI chatbots. Start free, upgrade when you need more.{% endblock %}
 {% block content %}
 <section class="px-4 py-20 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-5xl text-center">
     <h1 class="text-4xl font-bold text-white sm:text-5xl">Plans that scale with you</h1>
     <p class="mt-4 text-lg text-slate-400">Start free. Upgrade when you need more chatbots and messages.</p>
+
+    <!-- Billing toggle -->
+    <div class="mt-8 inline-flex items-center gap-3 rounded-2xl p-1.5" style="background:rgba(15,23,42,0.8);border:1px solid rgba(148,163,184,0.1)">
+      <button id="billing-monthly" class="rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all" style="background:rgba(16,185,129,0.2);color:#34d399">Monthly</button>
+      <button id="billing-annual" class="rounded-xl px-5 py-2 text-sm font-medium text-slate-400 transition-all hover:text-white">
+        Annual
+        <span class="ml-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold" style="background:rgba(16,185,129,0.15);color:#34d399">2 months free</span>
+      </button>
+    </div>
   </div>
 
-  <div class="mx-auto mt-16 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
-    <div class="cs-glass rounded-2xl p-6">
+  <div class="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <!-- Free -->
+    <div class="kly-pricing-card">
       <p class="text-sm font-medium text-slate-400">Free</p>
       <p class="mt-2 text-3xl font-bold text-white">$0</p>
-      <ul class="mt-6 space-y-2 text-sm text-slate-300">
-        <li>1 chatbot</li>
-        <li>100 messages / mo</li>
+      <p class="mt-1 text-xs text-slate-500">Forever free</p>
+      <ul class="mt-6 flex flex-col gap-2.5 text-sm text-slate-300">
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>1 chatbot</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>100 messages / mo</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Embeddable widget</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Lead capture</li>
       </ul>
-      <a href="/signup" class="mt-8 block rounded-xl border border-slate-600 py-3 text-center text-sm font-semibold text-white hover:border-emerald-500/50">Start free</a>
+      <div class="mt-auto pt-8">
+        <a href="/signup" class="block rounded-xl border border-slate-600 py-3 text-center text-sm font-semibold text-white transition hover:border-emerald-500/50 hover:bg-emerald-500/5">Start free</a>
+      </div>
     </div>
 
-    <div class="cs-glass rounded-2xl p-6">
+    <!-- Starter -->
+    <div class="kly-pricing-card">
       <p class="text-sm font-medium text-emerald-400">Starter</p>
-      <p class="mt-2 text-3xl font-bold text-white">$39<span class="text-base font-normal text-slate-400">/mo</span></p>
-      <ul class="mt-6 space-y-2 text-sm text-slate-300">
-        <li>2 chatbots</li>
-        <li>3,000 messages / mo</li>
+      <p class="mt-2 text-3xl font-bold text-white"><span class="price-val" data-monthly="$39" data-annual="$32">$39</span><span class="text-base font-normal text-slate-400">/mo</span></p>
+      <p class="mt-1 text-xs text-slate-500">Great for growing sites</p>
+      <ul class="mt-6 flex flex-col gap-2.5 text-sm text-slate-300">
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>2 chatbots</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>3,000 messages / mo</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Multi-page crawl</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Analytics dashboard</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Email support</li>
       </ul>
-      <button type="button" data-checkout-plan="starter" class="mt-8 w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-500">Upgrade</button>
+      <div class="mt-auto pt-8">
+        <button type="button" data-checkout-plan="starter" class="cs-btn-shine w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">Upgrade</button>
+      </div>
     </div>
 
-    <div class="cs-glass relative rounded-2xl border border-emerald-500/30 p-6">
-      <span class="absolute right-3 top-3 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300">Popular</span>
-      <p class="text-sm font-medium text-emerald-400">Pro</p>
-      <p class="mt-2 text-3xl font-bold text-white">$89<span class="text-base font-normal text-slate-400">/mo</span></p>
-      <ul class="mt-6 space-y-2 text-sm text-slate-300">
-        <li>5 chatbots</li>
-        <li>12,000 messages / mo</li>
+    <!-- Pro (featured) -->
+    <div class="kly-pricing-card featured">
+      <div class="absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold" style="background:rgba(6,182,212,0.15);color:#22d3ee">Most popular</div>
+      <p class="text-sm font-medium" style="color:#22d3ee">Pro</p>
+      <p class="mt-2 text-3xl font-bold text-white"><span class="price-val" data-monthly="$89" data-annual="$74">$89</span><span class="text-base font-normal text-slate-400">/mo</span></p>
+      <p class="mt-1 text-xs text-slate-500">For serious businesses</p>
+      <ul class="mt-6 flex flex-col gap-2.5 text-sm text-slate-300">
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>5 chatbots</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>12,000 messages / mo</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Document upload (PDF, DOCX)</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Custom branding</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Priority support</li>
       </ul>
-      <button type="button" data-checkout-plan="pro" class="mt-8 w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-500">Upgrade</button>
+      <div class="mt-auto pt-8">
+        <button type="button" data-checkout-plan="pro" class="cs-btn-shine w-full rounded-xl py-3 text-sm font-semibold text-white transition" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6)">Upgrade to Pro</button>
+      </div>
     </div>
 
-    <div class="cs-glass rounded-2xl p-6">
+    <!-- Agency -->
+    <div class="kly-pricing-card">
       <p class="text-sm font-medium text-slate-400">Agency</p>
-      <p class="mt-2 text-3xl font-bold text-white">$249<span class="text-base font-normal text-slate-400">/mo</span></p>
-      <ul class="mt-6 space-y-2 text-sm text-slate-300">
-        <li>25 chatbots</li>
-        <li>50,000 messages / mo</li>
+      <p class="mt-2 text-3xl font-bold text-white"><span class="price-val" data-monthly="$249" data-annual="$207">$249</span><span class="text-base font-normal text-slate-400">/mo</span></p>
+      <p class="mt-1 text-xs text-slate-500">For teams &amp; agencies</p>
+      <ul class="mt-6 flex flex-col gap-2.5 text-sm text-slate-300">
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>25 chatbots</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>50,000 messages / mo</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>White-label widget</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>API access</li>
+        <li class="flex items-center gap-2"><svg class="h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Dedicated support</li>
       </ul>
-      <button type="button" data-checkout-plan="agency" class="mt-8 w-full rounded-xl border border-emerald-500/40 py-3 text-sm font-semibold text-emerald-300 hover:bg-emerald-500/10">Upgrade</button>
+      <div class="mt-auto pt-8">
+        <button type="button" data-checkout-plan="agency" class="cs-btn-shine w-full rounded-xl border border-emerald-500/40 py-3 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/10">Upgrade</button>
+      </div>
     </div>
   </div>
 
@@ -62,6 +99,40 @@
   document.addEventListener("DOMContentLoaded", function () {
     if (window.CS && window.CS.initTiltCards) window.CS.initTiltCards();
     if (window.KlyroBilling) window.KlyroBilling.initPricingPage();
+
+    // Billing period toggle
+    var btnMonthly = document.getElementById("billing-monthly");
+    var btnAnnual = document.getElementById("billing-annual");
+    var priceEls = document.querySelectorAll(".price-val");
+    var isAnnual = false;
+
+    var activeStyle = "background:rgba(16,185,129,0.2);color:#34d399";
+    var inactiveStyle = "background:transparent;color:#94a3b8";
+
+    function setToggle(annual) {
+      isAnnual = annual;
+      if (annual) {
+        btnAnnual.style.cssText = "background:rgba(16,185,129,0.2);color:#34d399";
+        btnMonthly.style.cssText = "background:transparent;color:#94a3b8";
+      } else {
+        btnMonthly.style.cssText = "background:rgba(16,185,129,0.2);color:#34d399";
+        btnAnnual.style.cssText = "background:transparent;color:#94a3b8";
+      }
+      priceEls.forEach(function (el) {
+        var target = annual ? el.dataset.annual : el.dataset.monthly;
+        if (target) {
+          el.style.transition = "opacity 0.2s";
+          el.style.opacity = "0";
+          setTimeout(function () {
+            el.textContent = target;
+            el.style.opacity = "1";
+          }, 150);
+        }
+      });
+    }
+
+    if (btnMonthly) btnMonthly.addEventListener("click", function () { setToggle(false); });
+    if (btnAnnual) btnAnnual.addEventListener("click", function () { setToggle(true); });
   });
 </script>
 {% endblock %}
